@@ -1,0 +1,30 @@
+{
+    "project": {
+        "name": "Album Categorizer",
+        "description": "Streamlit-based web application for categorizing music albums",
+        "type": "web-application"
+    },
+    "preferences": {
+        "communication_language": "hungarian",
+        "code_language": "python",
+        "code_style": {
+            "language": "python",
+            "indent": 4,
+            "quotes": "single",
+            "docstring": "english",
+            "comments": "english"
+        }
+    },
+    "context": {
+        "framework": "streamlit",
+        "database": "none",
+        "frontend": "streamlit",
+        "primary_language": "python",
+        "development_phase": "initial"
+    },
+    "tools": {
+        "package_manager": "pip",
+        "virtual_environment": "venv",
+        "version_control": "git"
+    }
+}
