@@ -11,6 +11,10 @@ st.set_page_config(
     layout="centered"
 )
 
+# Initialize session state
+if 'previous_url' not in st.session_state:
+    st.session_state.previous_url = ''
+
 # Discogs API configuration
 DISCOGS_API_URL = "https://api.discogs.com"
 DISCOGS_USER_AGENT = "AlbumCategorizer/1.0"
@@ -53,15 +57,19 @@ with col1:
     discogs_url = st.text_input(
         label="Discogs URL",
         placeholder="https://www.discogs.com/release/...",
-        help="Paste a Discogs album URL here"
+        help="Paste a Discogs album URL here",
+        key="url_input"
     )
 
 # Button in the second (narrower) column
 with col2:
     fetch_button = st.button("Fetch Data", type="primary", use_container_width=True)
 
-# Handle button click
-if fetch_button and discogs_url:
+# Check if we should fetch data (either button clicked or new URL entered)
+should_fetch = fetch_button or (discogs_url != st.session_state.previous_url and discogs_url)
+
+if should_fetch:
+    st.session_state.previous_url = discogs_url
     with st.spinner('Fetching album data...'):
         data, response, error = fetch_discogs_data(discogs_url)
         
@@ -69,21 +77,7 @@ if fetch_button and discogs_url:
             st.error(error)
         else:
             # API Response Debug Section
-            with st.expander("🔍 View API Response Details"):
-                # Request information
-                # st.subheader("Request Details")
-                # st.write(f"**URL:** `{response.url}`")
-                # st.write("**Headers:**")
-                # st.json(dict(response.request.headers))
-                
-                # Response information
-                # st.subheader("Response Details")
-                # st.write(f"**Status Code:** {response.status_code}")
-                # st.write("**Response Headers:**")
-                # st.json(dict(response.headers))
-                
-                # Response body
-                # st.subheader("Response Body")
+            with st.expander(" View API Response Details"):
                 st.json(response.json())
 
             # Display album information
@@ -107,4 +101,3 @@ if fetch_button and discogs_url:
             st.subheader("Tracklist")
             for track in data.get('tracklist', []):
                 st.write(f"- {track.get('position', '')} {track.get('title', 'N/A')} ({track.get('duration', 'N/A')})")
-            
