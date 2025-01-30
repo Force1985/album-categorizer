@@ -1,34 +1,7 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
 # Python Virtual Environment
 venv/
 env/
 ENV/
-
-# Flask
-instance/
-.webassets-cache
 
 # Environment variables
 .env
@@ -36,27 +9,6 @@ instance/
 .env.development.local
 .env.test.local
 .env.production.local
-
-# Node.js (globally)
-**/node_modules/
-**/npm-debug.log*
-**/yarn-debug.log*
-**/yarn-error.log*
-**/.pnp
-**/.pnp.js
-
-# React build outputs
-**/build/
-**/dist/
-**/coverage/
-
-# IDE and Editor files
-.idea/
-.vscode/
-*.swp
-*.swo
-*.sublime-workspace
-*.sublime-project
 
 # OS generated files
 .DS_Store
