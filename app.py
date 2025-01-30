@@ -3,6 +3,7 @@ import requests
 import re
 import json
 from urllib.parse import urlparse
+from PIL import Image
 from transformations import (
     transform_label,
     transform_catalog,
@@ -10,11 +11,15 @@ from transformations import (
     transform_title
 )
 
+# Load custom favicon
+favicon = Image.open("favicon.ico")
+
 # Page configuration
 st.set_page_config(
     page_title="Album Categorizer",
-    page_icon="🎵",
-    layout="wide"
+    page_icon=favicon,
+    layout="wide",
+    initial_sidebar_state="collapsed",
 )
 
 # Initialize session state
@@ -65,7 +70,20 @@ def fetch_discogs_data(url):
         return None, None, f"Error fetching data: {str(e)}"
 
 # Main title and description
-st.title("Album Categorizer 🎵")
+st.markdown("""
+    <style>
+        .custom-title {
+            font-family: "Source Sans Pro", sans-serif;
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: rgb(49, 51, 63);
+        }
+        .custom-title span {
+            color: #ff4b4b;
+        }
+    </style>
+    <h1 class="custom-title">Album Categorizer <span>♪</span></h1>
+""", unsafe_allow_html=True)
 st.write("Fetch and organize your favorite albums from Discogs with ease.")
 
 # Create a row for the input field and button using columns
