@@ -20,6 +20,8 @@ st.set_page_config(
 # Initialize session state
 if 'previous_url' not in st.session_state:
     st.session_state.previous_url = ''
+if 'api_response' not in st.session_state:
+    st.session_state.api_response = None
 
 # Initialize input fields and original values in session state
 for key in ['label', 'catalog', 'artist', 'title']:
@@ -76,7 +78,8 @@ with col1:
         placeholder="https://www.discogs.com/release/...",
         help="Paste a Discogs album URL here",
         key="url_input",
-        value="https://www.discogs.com/release/5887661-Hironori-Takahashi-Blending-Mode-EP"
+        # Don't delete the following line
+        # value="https://www.discogs.com/release/5887661-Hironori-Takahashi-Blending-Mode-EP"
     )
 
 # Button in the second (narrower) column
@@ -93,10 +96,11 @@ if should_fetch:
         
         if error:
             st.error(error)
+            # Clear API response on error
+            st.session_state.api_response = None
         else:
-            # API Response Debug Section
-            with st.expander("🔍 View API Response Details"):
-                st.json(response.json())
+            # Store API response in session state
+            st.session_state.api_response = response.json()
 
             # Get raw values from API
             raw_label = data.get('labels', [{}])[0].get('name', '')
@@ -127,43 +131,48 @@ if should_fetch:
             st.session_state.artist = transform_artist(raw_artist)
             st.session_state.title = transform_title(raw_title, format_descriptions)
 
-# File/Folder Name Section
-st.subheader("File / Folder Name")
+# API Response Debug Section (always visible if we have a response)
+if st.session_state.api_response:
+    with st.expander("🔍 View API Response Details"):
+        st.json(st.session_state.api_response)
 
-# Create 4 columns for the input fields
-col1, sep1, col2, sep2, col3, sep3, col4 = st.columns([10, 1, 10, 1, 10, 1, 10])
+    # File/Folder Name Section - only show if we have API response
+    st.subheader("File / Folder Name")
 
-with col1:
-    st.text_input(
-        f"Label (API: {st.session_state.original_label})" if st.session_state.original_label else "Label",
-        key="label"
-    )
-with sep1:
-    st.markdown("<div style='text-align: center; padding-top: 30px;'>-</div>", unsafe_allow_html=True)
-with col2:
-    st.text_input(
-        f"Catalog# (API: {st.session_state.original_catalog})" if st.session_state.original_catalog else "Catalog#",
-        key="catalog"
-    )
-with sep2:
-    st.markdown("<div style='text-align: center; padding-top: 30px;'>-</div>", unsafe_allow_html=True)
-with col3:
-    st.text_input(
-        f"Artist (API: {st.session_state.original_artist})" if st.session_state.original_artist else "Artist",
-        key="artist"
-    )
-with sep3:
-    st.markdown("<div style='text-align: center; padding-top: 30px;'>-</div>", unsafe_allow_html=True)
-with col4:
-    st.text_input(
-        f"Title (API: {st.session_state.original_title})" if st.session_state.original_title else "Title",
-        key="title"
-    )
+    # Create 4 columns for the input fields
+    col1, sep1, col2, sep2, col3, sep3, col4 = st.columns([10, 1, 10, 1, 10, 1, 10])
 
-# Combined output field
-st.text_input(
-    "Combined Name",
-    value=update_combined_output(),
-    disabled=True,
-    key="combined_output"
-)
+    with col1:
+        st.text_input(
+            f"Label (API: {st.session_state.original_label})" if st.session_state.original_label else "Label",
+            key="label"
+        )
+    with sep1:
+        st.markdown("<div style='text-align: center; padding-top: 30px;'>-</div>", unsafe_allow_html=True)
+    with col2:
+        st.text_input(
+            f"Catalog# (API: {st.session_state.original_catalog})" if st.session_state.original_catalog else "Catalog#",
+            key="catalog"
+        )
+    with sep2:
+        st.markdown("<div style='text-align: center; padding-top: 30px;'>-</div>", unsafe_allow_html=True)
+    with col3:
+        st.text_input(
+            f"Artist (API: {st.session_state.original_artist})" if st.session_state.original_artist else "Artist",
+            key="artist"
+        )
+    with sep3:
+        st.markdown("<div style='text-align: center; padding-top: 30px;'>-</div>", unsafe_allow_html=True)
+    with col4:
+        st.text_input(
+            f"Title (API: {st.session_state.original_title})" if st.session_state.original_title else "Title",
+            key="title"
+        )
+
+    # Combined output field
+    st.text_input(
+        "Combined Name",
+        value=update_combined_output(),
+        disabled=True,
+        key="combined_output"
+    )
