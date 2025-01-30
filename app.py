@@ -79,7 +79,7 @@ with col1:
         help="Paste a Discogs album URL here",
         key="url_input",
         # Don't delete the following line
-        # value="https://www.discogs.com/release/5887661-Hironori-Takahashi-Blending-Mode-EP"
+        value="https://www.discogs.com/release/5887661-Hironori-Takahashi-Blending-Mode-EP"
     )
 
 # Button in the second (narrower) column
@@ -170,10 +170,14 @@ if st.session_state.api_response:
             key="title"
         )
 
-    # Combined output field
-    st.text_input(
-        "Combined Name",
-        value=update_combined_output(),
-        disabled=True,
-        key="combined_output"
-    )
+    # Combined output field with Save folder button
+    combined_col1, combined_col2 = st.columns([4, 1], vertical_alignment="bottom")
+    with combined_col1:
+        st.text_input(
+            "Combined Name",
+            value=update_combined_output(),
+            disabled=True,
+            key="combined_output"
+        )
+    with combined_col2:
+        st.button("Save Folder", key="save_folder_btn", type="secondary", use_container_width=True)
