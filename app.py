@@ -105,7 +105,8 @@ if should_fetch:
             # Get raw values from API
             raw_label = data.get('labels', [{}])[0].get('name', '')
             raw_catalog = data.get('labels', [{}])[0].get('catno', '')
-            raw_artist = ' & '.join(artist.get('name', '') for artist in data.get('artists', []))
+            raw_artist = ', '.join(artist.get('name', '') for artist in data.get('artists', []))
+            input_artist = ' & '.join(artist.get('name', '') for artist in data.get('artists', []))
             raw_title = data.get('title', '')
 
             # Get format information
@@ -128,7 +129,7 @@ if should_fetch:
             # Apply transformations and update current values
             st.session_state.label = transform_label(raw_label)
             st.session_state.catalog = transform_catalog(raw_catalog, st.session_state.label)
-            st.session_state.artist = transform_artist(raw_artist)
+            st.session_state.artist = transform_artist(input_artist)
             st.session_state.title = transform_title(raw_title, format_descriptions)
 
 # API Response Debug Section (always visible if we have a response)
