@@ -10,6 +10,9 @@ def render_folder_output(api_response):
     if not api_response:
         return
 
+    # File/Folder Name Section - only show if we have API response
+    st.subheader("File / Folder Name")
+
     # Create 4 columns for the input fields
     col1, sep1, col2, sep2, col3, sep3, col4 = st.columns([10, 1, 10, 1, 10, 1, 10])
 
