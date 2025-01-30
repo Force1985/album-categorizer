@@ -3,6 +3,12 @@ import requests
 import re
 import json
 from urllib.parse import urlparse
+from transformations import (
+    transform_label,
+    transform_catalog,
+    transform_artist,
+    transform_title
+)
 
 # Page configuration
 st.set_page_config(
@@ -92,22 +98,34 @@ if should_fetch:
             with st.expander("🔍 View API Response Details"):
                 st.json(response.json())
 
-            # Update session state with new values
-            label_value = data.get('labels', [{}])[0].get('name', '')
-            catalog_value = data.get('labels', [{}])[0].get('catno', '')
-            artist_value = data.get('artists', [{}])[0].get('name', '')
-            title_value = data.get('title', '')
+            # Get raw values from API
+            raw_label = data.get('labels', [{}])[0].get('name', '')
+            raw_catalog = data.get('labels', [{}])[0].get('catno', '')
+            raw_artist = ' & '.join(artist.get('name', '') for artist in data.get('artists', []))
+            raw_title = data.get('title', '')
 
-            st.session_state.label = label_value
-            st.session_state.catalog = catalog_value
-            st.session_state.artist = artist_value
-            st.session_state.title = title_value
+            # Get format information
+            formats = data.get('formats', [{}])
+            format_descriptions = []
+            for fmt in formats:
+                # Add descriptions from the format level
+                if 'descriptions' in fmt:
+                    format_descriptions.extend(desc.upper() for desc in fmt.get('descriptions', []))
+                # Add descriptions from the format_description level
+                if 'format_description' in fmt:
+                    format_descriptions.append(fmt['format_description'].upper())
 
-            # Store original values
-            st.session_state.original_label = label_value
-            st.session_state.original_catalog = catalog_value
-            st.session_state.original_artist = artist_value
-            st.session_state.original_title = title_value
+            # Store original (raw) values
+            st.session_state.original_label = raw_label
+            st.session_state.original_catalog = raw_catalog
+            st.session_state.original_artist = raw_artist
+            st.session_state.original_title = raw_title
+
+            # Apply transformations and update current values
+            st.session_state.label = transform_label(raw_label)
+            st.session_state.catalog = transform_catalog(raw_catalog, st.session_state.label)
+            st.session_state.artist = transform_artist(raw_artist)
+            st.session_state.title = transform_title(raw_title, format_descriptions)
 
 # File/Folder Name Section
 st.subheader("File / Folder Name")
