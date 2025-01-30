@@ -6,7 +6,7 @@ A Streamlit-based web application for organizing and categorizing music albums.
 
 1. Create a Python virtual environment:
 ```bash
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate  # macOS/Linux
 ```
 
