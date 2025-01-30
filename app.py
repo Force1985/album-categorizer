@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import re
+import json
 from urllib.parse import urlparse
 
 # Page configuration
@@ -24,7 +25,7 @@ def fetch_discogs_data(url):
     """Fetch album data from Discogs API"""
     release_id = extract_release_id(url)
     if not release_id:
-        return None, "Invalid Discogs URL. Please use a release URL (e.g., https://www.discogs.com/release/123)"
+        return None, None, "Invalid Discogs URL. Please use a release URL (e.g., https://www.discogs.com/release/123)"
 
     headers = {
         'User-Agent': DISCOGS_USER_AGENT
@@ -36,9 +37,9 @@ def fetch_discogs_data(url):
             headers=headers
         )
         response.raise_for_status()
-        return response.json(), None
+        return response.json(), response, None
     except requests.exceptions.RequestException as e:
-        return None, f"Error fetching data: {str(e)}"
+        return None, None, f"Error fetching data: {str(e)}"
 
 # Main title and description
 st.title("Album Categorizer 🎵")
@@ -62,11 +63,29 @@ with col2:
 # Handle button click
 if fetch_button and discogs_url:
     with st.spinner('Fetching album data...'):
-        data, error = fetch_discogs_data(discogs_url)
+        data, response, error = fetch_discogs_data(discogs_url)
         
         if error:
             st.error(error)
         else:
+            # API Response Debug Section
+            with st.expander("🔍 View API Response Details"):
+                # Request information
+                # st.subheader("Request Details")
+                # st.write(f"**URL:** `{response.url}`")
+                # st.write("**Headers:**")
+                # st.json(dict(response.request.headers))
+                
+                # Response information
+                # st.subheader("Response Details")
+                # st.write(f"**Status Code:** {response.status_code}")
+                # st.write("**Response Headers:**")
+                # st.json(dict(response.headers))
+                
+                # Response body
+                # st.subheader("Response Body")
+                st.json(response.json())
+
             # Display album information
             st.subheader("Album Information")
             
@@ -88,3 +107,4 @@ if fetch_button and discogs_url:
             st.subheader("Tracklist")
             for track in data.get('tracklist', []):
                 st.write(f"- {track.get('position', '')} {track.get('title', 'N/A')} ({track.get('duration', 'N/A')})")
+            
