@@ -10,6 +10,7 @@ from transformations import (
     transform_artist,
     transform_title
 )
+import os
 
 # Load custom favicon
 favicon = Image.open("favicon.ico")
@@ -191,11 +192,23 @@ if st.session_state.api_response:
     # Combined output field with Save folder button
     combined_col1, combined_col2 = st.columns([4, 1], vertical_alignment="bottom")
     with combined_col1:
-        st.text_input(
+        combined_output = st.text_input(
             "Combined Name",
             value=update_combined_output(),
             disabled=True,
             key="combined_output"
         )
     with combined_col2:
-        st.button("Save Folder", key="save_folder_btn", type="secondary", use_container_width=True)
+        if st.button("Save Folder", key="save_folder_btn", type="secondary", use_container_width=True):
+            # Create export directory if it doesn't exist
+            export_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'export')
+            if not os.path.exists(export_dir):
+                os.makedirs(export_dir)
+            
+            # Create the album directory inside export
+            album_dir = os.path.join(export_dir, combined_output)
+            if not os.path.exists(album_dir):
+                os.makedirs(album_dir)
+                st.toast(f"Created folder: {os.path.basename(album_dir)}", icon="✅")
+            else:
+                st.toast(f"Folder already exists: {os.path.basename(album_dir)}", icon="⚠️")
