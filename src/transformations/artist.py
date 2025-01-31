@@ -8,7 +8,7 @@ def transform_artist(artist: str) -> str:
     Transform a single artist name
     
     Args:
-        artist: Single artist name from Discogs API
+        artist: Artist name string
         
     Returns:
         Transformed artist name

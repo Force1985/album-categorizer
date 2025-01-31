@@ -73,8 +73,8 @@ if should_fetch:
             # Get raw values from API
             raw_label = data.get('labels', [{}])[0].get('name', '')
             raw_catalog = data.get('labels', [{}])[0].get('catno', '')
-            raw_artist = ', '.join(artist.get('name', '') for artist in data.get('artists', []))
-            input_artist = ' & '.join(artist.get('name', '') for artist in data.get('artists', []))
+            raw_artist = ', '.join(artist.get('anv') or artist.get('name', '') for artist in data.get('artists', []))
+            input_artist = ' & '.join(artist.get('anv') or artist.get('name', '') for artist in data.get('artists', []))
             raw_title = data.get('title', '')
 
             # Get format information
