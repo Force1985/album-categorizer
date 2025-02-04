@@ -8,6 +8,7 @@ from src.transformations import (
 )
 from src.components.url_input import render_url_input
 from src.components.folder_output import render_folder_output
+from src.components.info_panel import render_info_panel
 from src.api.discogs import fetch_discogs_data
 
 # Load custom favicon
@@ -107,3 +108,4 @@ if st.session_state.api_response:
 
     # Render folder output component
     render_folder_output(st.session_state.api_response)
+    render_info_panel()
