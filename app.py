@@ -77,6 +77,7 @@ if should_fetch:
             raw_artist = ', '.join(artist.get('anv') or artist.get('name', '') for artist in data.get('artists', []))
             input_artist = ' & '.join(artist.get('anv') or artist.get('name', '') for artist in data.get('artists', []))
             raw_title = data.get('title', '')
+            raw_artists_sort = data.get('artists_sort', '')
 
             # Get format information
             formats = data.get('formats', [{}])
@@ -94,6 +95,7 @@ if should_fetch:
             st.session_state.original_catalog = raw_catalog
             st.session_state.original_artist = raw_artist
             st.session_state.original_title = raw_title
+            st.session_state.original_artists_sort = raw_artists_sort
 
             # Apply transformations and update current values
             st.session_state.label = transform_label(raw_label)
