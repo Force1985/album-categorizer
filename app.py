@@ -109,5 +109,5 @@ if st.session_state.api_response:
         st.json(st.session_state.api_response)
 
     # Render folder output component
-    render_folder_output(st.session_state.api_response)
+    render_folder_output()
     render_info_panel()

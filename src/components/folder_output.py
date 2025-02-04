@@ -5,10 +5,8 @@ def update_combined_output(label, catalog, artist, title):
     """Update the combined output when any input changes"""
     return f"{label} {catalog} - {artist} - {title}"
 
-def render_folder_output(api_response):
+def render_folder_output():
     """Render the folder output component"""
-    if not api_response:
-        return
 
     # File/Folder Name Section - only show if we have API response
     st.subheader("File / Folder Name")
