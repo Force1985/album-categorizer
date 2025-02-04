@@ -1,6 +1,16 @@
-from .label import transform_label
-from .catalog import transform_catalog
-from .artist import transform_artist
-from .title import transform_title
+"""
+Transformation functions for various data types
+"""
+from .folder import (
+    transform_artist,
+    transform_catalog,
+    transform_label,
+    transform_title
+)
 
-__all__ = ['transform_label', 'transform_catalog', 'transform_artist', 'transform_title']
+__all__ = [
+    'transform_artist',
+    'transform_catalog',
+    'transform_label',
+    'transform_title'
+]
