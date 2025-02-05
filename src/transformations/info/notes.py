@@ -2,7 +2,7 @@
 Info notes transformations
 """
 
-def transform_info_notes_label(notes: str, max_length: int = 50) -> str:
+def transform_info_notes_label(notes: str, max_length: int = 100) -> str:
     """
     Transform notes text for label display by truncating if too long
     
