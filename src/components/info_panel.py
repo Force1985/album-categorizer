@@ -1,5 +1,5 @@
 import streamlit as st
-from ..transformations.info import transform_info_artist, transform_info_format, transform_info_notes_label
+from ..transformations.info import transform_info_artist, transform_info_label, transform_info_format, transform_info_notes_label
 
 def render_info_panel():
     """
@@ -40,7 +40,7 @@ def render_info_panel():
         with col1:
             info_label = st.text_input(
                 f"Label / API: {st.session_state.original_label}" if 'original_label' in st.session_state else "Label",
-                value=st.session_state.get('original_label', ''),
+                value=transform_info_label(st.session_state.get('original_label', '')),
                 key="info_label"
             )
         with sep1:

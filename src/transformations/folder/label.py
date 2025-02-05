@@ -6,6 +6,7 @@ import re
 def transform_label(label_name: str) -> str:
     """
     Transform label name by removing common suffixes like 'Records' or 'Recordings'
+    and numbers in parentheses
     
     Args:
         label_name: Original label name from Discogs API
@@ -15,6 +16,9 @@ def transform_label(label_name: str) -> str:
     """
     if not label_name:
         return label_name
+        
+    # Remove numbers in parentheses (e.g., "Global Underground (3)" -> "Global Underground")
+    label_name = re.sub(r'\s*\(\d+\)\s*', '', label_name).strip()
         
     # List of suffixes to remove (case insensitive)
     suffixes = [' records', ' recordings']
@@ -27,8 +31,8 @@ def transform_label(label_name: str) -> str:
         if label_lower.endswith(suffix):
             # Remove the suffix from the original string (preserving original case)
             return label_name[:-len(suffix)].strip()
-    
-    return label_name
+            
+    return label_name.strip()
 
 def get_label_variations(label: str) -> list[str]:
     """
