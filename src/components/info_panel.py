@@ -3,9 +3,7 @@ from ..transformations.info import (
     transform_info_artist,
     transform_info_label,
     transform_info_format,
-    transform_info_format_label,
-    transform_info_notes,
-    transform_info_notes_label
+    transform_info_notes
 )
 
 def render_info_panel():
@@ -73,7 +71,6 @@ def render_info_panel():
                 format_label_parts.append(f"t: {st.session_state.original_format_text}")
                 
             format_label = "Format / API: " + ", ".join(format_label_parts) if format_label_parts else "Format"
-            info_format_label = transform_info_format_label(format_label)
             
             formatted_format = transform_info_format(
                 st.session_state.get('formats_qty', ''),
@@ -82,7 +79,7 @@ def render_info_panel():
                 st.session_state.get('format_text', '')
             )
             info_format = st.text_input(
-                info_format_label,
+                format_label,
                 value=formatted_format,
                 key="info_format"
             )
@@ -115,7 +112,7 @@ def render_info_panel():
             st.markdown("<div class='separator'>-</div>", unsafe_allow_html=True)
         with col3:
             # Transform notes for label display
-            notes_label = transform_info_notes_label(st.session_state.get('original_notes', ''))
+            notes_label = st.session_state.get('original_notes', '')
 
             # Transform notes with artist credit
             transformed_notes = transform_info_notes(
