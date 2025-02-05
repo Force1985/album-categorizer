@@ -20,21 +20,21 @@ def render_folder_output():
             key="label"
         )
     with sep1:
-        st.markdown("<div style='text-align: center; padding-top: 30px;'>-</div>", unsafe_allow_html=True)
+        st.markdown("<div class='separator'>-</div>", unsafe_allow_html=True)
     with col2:
         catalog = st.text_input(
             f"Catalog# / API: {st.session_state.original_catalog}" if st.session_state.original_catalog else "Catalog#",
             key="catalog"
         )
     with sep2:
-        st.markdown("<div style='text-align: center; padding-top: 30px;'>-</div>", unsafe_allow_html=True)
+        st.markdown("<div class='separator'>-</div>", unsafe_allow_html=True)
     with col3:
         artist = st.text_input(
             f"Artist / API: {st.session_state.original_artist}" if st.session_state.original_artist else "Artist",
             key="artist"
         )
     with sep3:
-        st.markdown("<div style='text-align: center; padding-top: 30px;'>-</div>", unsafe_allow_html=True)
+        st.markdown("<div class='separator'>-</div>", unsafe_allow_html=True)
     with col4:
         title = st.text_input(
             f"Title / API: {st.session_state.original_title}" if st.session_state.original_title else "Title",

@@ -41,20 +41,7 @@ for key in ['format_descriptions']:
         st.session_state[key] = []
 
 # Main title and description
-st.markdown("""
-    <style>
-        .custom-title {
-            font-family: "Source Sans Pro", sans-serif;
-            font-size: 2.25rem;
-            font-weight: 700;
-            color: rgb(49, 51, 63);
-        }
-        .custom-title span {
-            color: #ff4b4b;
-        }
-    </style>
-    <h1 class="custom-title">Album Categorizer <span>♪</span></h1>
-""", unsafe_allow_html=True)
+st.markdown("<h1 class='custom-title'>Album Categorizer <span>♪</span></h1>", unsafe_allow_html=True)
 st.write("Fetch and organize your favorite albums from Discogs with ease.")
 
 # Render URL input component
@@ -130,6 +117,10 @@ if should_fetch:
 if st.session_state.api_response:
     with st.expander("🔍 View API Response Details"):
         st.json(st.session_state.api_response)
+
+    # Load global CSS
+    with open('static/styles.css') as f:
+        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
     # Render folder output component
     render_folder_output()

@@ -25,7 +25,7 @@ def render_info_panel():
                 key="info_artist"
             )
         with sep1:
-            st.markdown("<div style='text-align: center; padding-top: 30px;'>-</div>", unsafe_allow_html=True)
+            st.markdown("<div class='separator'>-</div>", unsafe_allow_html=True)
         with col2:
             info_title = st.text_input(
                 f"Title / API: {st.session_state.original_title}" if 'original_title' in st.session_state else "Title",
@@ -51,7 +51,7 @@ def render_info_panel():
                 key="info_label"
             )
         with sep1:
-            st.markdown("<div style='text-align: center; padding-top: 30px;'>-</div>", unsafe_allow_html=True)
+            st.markdown("<div class='separator'>-</div>", unsafe_allow_html=True)
         with col2:
             info_catalog = st.text_input(
                 f"Catalog# / API: {st.session_state.original_catalog}" if 'original_catalog' in st.session_state else "Catalog#",
@@ -59,7 +59,7 @@ def render_info_panel():
                 key="info_catalog"
             )
         with sep2:
-            st.markdown("<div style='text-align: center; padding-top: 30px;'>-</div>", unsafe_allow_html=True)
+            st.markdown("<div class='separator'>-</div>", unsafe_allow_html=True)
         with col3:
             # Build format label parts
             format_label_parts = []
@@ -87,7 +87,7 @@ def render_info_panel():
                 key="info_format"
             )
         with sep3:
-            st.markdown("<div style='text-align: center; padding-top: 30px;'>-</div>", unsafe_allow_html=True)
+            st.markdown("<div class='separator'>-</div>", unsafe_allow_html=True)
         with col4:
             info_country = st.text_input(
                 f"Country / API: {st.session_state.original_country}" if 'original_country' in st.session_state else "Country",
@@ -104,7 +104,7 @@ def render_info_panel():
                 key="info_released"
             )
         with sep1:
-            st.markdown("<div style='text-align: center; padding-top: 30px;'>-</div>", unsafe_allow_html=True)
+            st.markdown("<div class='separator'>-</div>", unsafe_allow_html=True)
         with col2:
             info_style = st.text_input(
                 f"Style / API: {st.session_state.original_style}" if 'original_style' in st.session_state else "Style",
@@ -112,19 +112,7 @@ def render_info_panel():
                 key="info_style"
             )
         with sep2:
-            st.markdown("<div style='text-align: center; padding-top: 30px;'>-</div>", unsafe_allow_html=True)
-        st.markdown("""
-            <style>
-                .st-key-info_notes textarea {
-                    height: 38px;
-                    min-height: 38px;
-                    padding-left: 0.5rem;
-                    padding-right: 0.5rem;
-                    padding-top: 0.5rem;
-                    padding-bottom: 0.5rem;
-                }
-            </style>
-        """, unsafe_allow_html=True)
+            st.markdown("<div class='separator'>-</div>", unsafe_allow_html=True)
         with col3:
             # Transform notes for label display
             notes_label = transform_info_notes_label(st.session_state.get('original_notes', ''))
