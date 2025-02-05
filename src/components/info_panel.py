@@ -1,5 +1,5 @@
 import streamlit as st
-from ..transformations.info import transform_info_artist, transform_info_format
+from ..transformations.info import transform_info_artist, transform_info_format, transform_info_notes_label
 
 def render_info_panel():
     """
@@ -86,6 +86,46 @@ def render_info_panel():
                 value=st.session_state.get('original_country', ''),
                 key="info_country"
             )
+        # Third row - Released, Style, Notes
+        col1, sep1, col2, sep2, col3 = st.columns([10, 1, 10, 1, 21])
+
+        with col1:
+            info_released = st.text_input(
+                f"Released / API: {st.session_state.original_released}" if 'original_released' in st.session_state else "Released",
+                value=st.session_state.get('original_released', ''),
+                key="info_released"
+            )
+        with sep1:
+            st.markdown("<div style='text-align: center; padding-top: 30px;'>-</div>", unsafe_allow_html=True)
+        with col2:
+            info_style = st.text_input(
+                f"Style / API: {st.session_state.original_style}" if 'original_style' in st.session_state else "Style",
+                value=st.session_state.get('original_style', ''),
+                key="info_style"
+            )
+        with sep2:
+            st.markdown("<div style='text-align: center; padding-top: 30px;'>-</div>", unsafe_allow_html=True)
+        st.markdown("""
+            <style>
+                .st-key-info_notes textarea {
+                    height: 38px;
+                    min-height: 38px;
+                    padding-left: 0.5rem;
+                    padding-right: 0.5rem;
+                    padding-top: 0.5rem;
+                    padding-bottom: 0.5rem;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+        with col3:
+            # Transform notes for label display
+            notes_label = transform_info_notes_label(st.session_state.get('original_notes', ''))
+            info_notes = st.text_area(
+                f"Notes / API: {notes_label}" if notes_label else "Notes",
+                value=st.session_state.get('original_notes', ''),
+                key="info_notes",
+                height=68
+            )
         
         template = f"""{st.session_state.info_artist} - {st.session_state.info_title}
 
@@ -93,10 +133,9 @@ Label: {st.session_state.info_label}
 Catalog#: {st.session_state.info_catalog}
 Format: {st.session_state.info_format}
 Country: {st.session_state.info_country}
-Released: [released]
-Style: [styles]
-Notes: Written & produced by ???.
-[notes]
+Released: {st.session_state.info_released}
+Style: {st.session_state.info_style}
+Notes: {st.session_state.info_notes}
 Discogs: [uri]
 
 Tracklist:

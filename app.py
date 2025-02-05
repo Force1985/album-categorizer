@@ -29,7 +29,7 @@ if 'api_response' not in st.session_state:
     st.session_state.api_response = None
 
 # Initialize input fields and original values in session state
-for key in ['label', 'catalog', 'artist', 'title', 'country', 'formats_qty', 'formats_name', 'format_text', 'format_descriptions']:
+for key in ['label', 'catalog', 'artist', 'title', 'country', 'formats_qty', 'formats_name', 'format_text', 'format_descriptions', 'released', 'style', 'notes']:
     if key not in st.session_state:
         st.session_state[key] = ''
     if f'original_{key}' not in st.session_state:
@@ -91,6 +91,9 @@ if should_fetch:
             raw_format_name = formats[0].get('name', '')
             raw_format_descriptions = formats[0].get('descriptions', [])
             raw_format_text = formats[0].get('text', '')
+            raw_released = data.get('released', '')
+            raw_styles = ', '.join(data.get('styles', []))
+            raw_notes = data.get('notes', '')
 
             # Store original values in session state
             st.session_state.original_label = raw_label
@@ -103,6 +106,9 @@ if should_fetch:
             st.session_state.original_format_descriptions = raw_format_descriptions
             st.session_state.original_format_text = raw_format_text
             st.session_state.original_country = raw_country
+            st.session_state.original_released = raw_released
+            st.session_state.original_style = raw_styles
+            st.session_state.original_notes = raw_notes
 
             # Apply transformations and update current values
             st.session_state.label = transform_label(raw_label)
@@ -114,6 +120,9 @@ if should_fetch:
             st.session_state.format_descriptions = raw_format_descriptions
             st.session_state.format_text = raw_format_text
             st.session_state.country = raw_country
+            st.session_state.released = raw_released
+            st.session_state.style = raw_styles
+            st.session_state.notes = raw_notes
 
 # API Response Debug Section (always visible if we have a response)
 if st.session_state.api_response:
