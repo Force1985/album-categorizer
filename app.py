@@ -29,7 +29,7 @@ if 'api_response' not in st.session_state:
     st.session_state.api_response = None
 
 # Initialize input fields and original values in session state
-for key in ['label', 'catalog', 'artist', 'title', 'country', 'formats_qty', 'formats_name', 'format_text', 'format_descriptions', 'released', 'style', 'notes']:
+for key in ['label', 'catalog', 'artist', 'title', 'country', 'formats_qty', 'formats_name', 'format_text', 'format_descriptions', 'released', 'style', 'notes', 'discogs_url']:
     if key not in st.session_state:
         st.session_state[key] = ''
     if f'original_{key}' not in st.session_state:
@@ -109,6 +109,7 @@ if should_fetch:
             st.session_state.original_released = raw_released
             st.session_state.original_style = raw_styles
             st.session_state.original_notes = raw_notes
+            st.session_state.original_discogs_url = discogs_url
 
             # Apply transformations and update current values
             st.session_state.label = transform_label(raw_label)
@@ -123,6 +124,7 @@ if should_fetch:
             st.session_state.released = raw_released
             st.session_state.style = raw_styles
             st.session_state.notes = raw_notes
+            st.session_state.discogs_url = discogs_url
 
 # API Response Debug Section (always visible if we have a response)
 if st.session_state.api_response:

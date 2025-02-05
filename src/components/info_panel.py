@@ -136,7 +136,7 @@ Country: {st.session_state.info_country}
 Released: {st.session_state.info_released}
 Style: {st.session_state.info_style}
 Notes: {st.session_state.info_notes}
-Discogs: [uri]
+Discogs: {st.session_state.discogs_url}
 
 Tracklist:
 [tracklist.position]. {st.session_state.info_artist} - [tracklist.title]    [tracklist.duration]
