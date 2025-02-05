@@ -1,5 +1,5 @@
 import streamlit as st
-from ..transformations.info import transform_info_artist, transform_info_label, transform_info_format, transform_info_notes_label
+from ..transformations.info import transform_info_artist, transform_info_label, transform_info_format, transform_info_format_label, transform_info_notes_label
 
 def render_info_panel():
     """
@@ -66,6 +66,7 @@ def render_info_panel():
                 format_label_parts.append(f"t: {st.session_state.original_format_text}")
                 
             format_label = "Format / API: " + ", ".join(format_label_parts) if format_label_parts else "Format"
+            info_format_label = transform_info_format_label(format_label)
             
             formatted_format = transform_info_format(
                 st.session_state.get('formats_qty', ''),
@@ -74,7 +75,7 @@ def render_info_panel():
                 st.session_state.get('format_text', '')
             )
             info_format = st.text_input(
-                format_label,
+                info_format_label,
                 value=formatted_format,
                 key="info_format"
             )

@@ -39,3 +39,22 @@ def transform_info_format(qty: str, name: str, descriptions: list[str], text: st
         format_str += f', {text}'
         
     return format_str
+
+def transform_info_format_label(format_str: str, max_length: int = 60) -> str:
+    """
+    Transform format string for label display by truncating if too long
+    
+    Args:
+        format_str: Format string to transform
+        max_length: Maximum length of the text before truncation
+        
+    Returns:
+        Truncated text with ellipsis if needed
+    """
+    if not format_str:
+        return ''
+        
+    if len(format_str) <= max_length:
+        return format_str
+        
+    return format_str[:max_length] + '...'
