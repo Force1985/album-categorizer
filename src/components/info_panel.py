@@ -1,5 +1,12 @@
 import streamlit as st
-from ..transformations.info import transform_info_artist, transform_info_label, transform_info_format, transform_info_format_label, transform_info_notes_label
+from ..transformations.info import (
+    transform_info_artist,
+    transform_info_label,
+    transform_info_format,
+    transform_info_format_label,
+    transform_info_notes,
+    transform_info_notes_label
+)
 
 def render_info_panel():
     """
@@ -121,9 +128,17 @@ def render_info_panel():
         with col3:
             # Transform notes for label display
             notes_label = transform_info_notes_label(st.session_state.get('original_notes', ''))
+
+            # Transform notes with artist credit
+            transformed_notes = transform_info_notes(
+                st.session_state.get('original_notes', ''),
+                st.session_state.get('original_artist', ''),
+                st.session_state.get('original_format_descriptions', [])
+            )
+            
             info_notes = st.text_area(
                 f"Notes / API: {notes_label}" if notes_label else "Notes",
-                value=st.session_state.get('original_notes', ''),
+                value=transformed_notes,
                 key="info_notes",
                 height=68
             )
