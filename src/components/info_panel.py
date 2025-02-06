@@ -129,6 +129,12 @@ def render_info_panel():
             st.markdown("<div class='separator'> </div>", unsafe_allow_html=True)
         
         with main_col2:
+            # Format multi-line notes with proper indentation
+            notes_content = st.session_state.info_notes.split('\n')
+            formatted_notes = 'Notes:    ' + notes_content[0]
+            if len(notes_content) > 1:
+                formatted_notes += '\n' + '\n'.join('          ' + line for line in notes_content[1:])
+
             # Display the template
             info_file_template = f"""{st.session_state.info_artist} - {st.session_state.info_title}
 
@@ -138,7 +144,7 @@ Format:   {st.session_state.info_format}
 Country:  {st.session_state.info_country}
 Released: {st.session_state.info_released}
 Style:    {st.session_state.info_style}
-Notes:    {st.session_state.info_notes}
+{formatted_notes}
 Discogs:  {st.session_state.discogs_url}
 
 Tracklist:
