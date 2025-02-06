@@ -107,11 +107,7 @@ def render_info_panel():
                     value=st.session_state.get('original_style', ''),
                     key="info_style"
                 )
-
-        with main_sep:
-            st.markdown("<div class='separator'> </div>", unsafe_allow_html=True)
-        
-        with main_col2:
+            
             # Transform notes for label display
             notes_label = st.session_state.get('original_notes', '')
 
@@ -126,28 +122,32 @@ def render_info_panel():
                 f"Notes / API: {notes_label}" if notes_label else "Notes",
                 value=transformed_notes,
                 key="info_notes",
-                height=290
+                height=200
             )
 
-        # Display the template
-        template = f"""{st.session_state.info_artist} - {st.session_state.info_title}
+        with main_sep:
+            st.markdown("<div class='separator'> </div>", unsafe_allow_html=True)
+        
+        with main_col2:
+            # Display the template
+            template = f"""{st.session_state.info_artist} - {st.session_state.info_title}
 
-Label: {st.session_state.info_label}
+Label:    {st.session_state.info_label}
 Catalog#: {st.session_state.info_catalog}
-Format: {st.session_state.info_format}
-Country: {st.session_state.info_country}
+Format:   {st.session_state.info_format}
+Country:  {st.session_state.info_country}
 Released: {st.session_state.info_released}
-Style: {st.session_state.info_style}
-Notes: {st.session_state.info_notes}
-Discogs: {st.session_state.discogs_url}
+Style:    {st.session_state.info_style}
+Notes:    {st.session_state.info_notes}
+Discogs:  {st.session_state.discogs_url}
 
 Tracklist:
 [tracklist.position]. {st.session_state.info_artist} - [tracklist.title]    [tracklist.duration]
     [extraartists.role] - [extraartists.name]"""
 
-        st.text_area(
-            label="Preview",
-            value=template,
-            height=400,
-            disabled=True
-        )
+            st.text_area(
+                label="Preview",
+                value=template,
+                height=536,
+                disabled=True
+            )
