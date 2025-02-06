@@ -49,3 +49,13 @@ textarea[disabled] {
     text-align: center;
     padding-top: 30px;
 }
+
+.separator-label {
+    padding-top: 28px;
+}
+
+.separator-line {
+    border-bottom: 1px solid var(--primary-color);
+    padding-bottom: 30px;
+    margin-bottom: 30px;
+}

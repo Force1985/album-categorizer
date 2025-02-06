@@ -122,7 +122,7 @@ def render_info_panel():
                 f"Notes / API: {notes_label}" if notes_label else "Notes",
                 value=transformed_notes,
                 key="info_notes",
-                height=200
+                height=280
             )
 
         with main_sep:
@@ -130,7 +130,7 @@ def render_info_panel():
         
         with main_col2:
             # Display the template
-            template = f"""{st.session_state.info_artist} - {st.session_state.info_title}
+            info_file_template = f"""{st.session_state.info_artist} - {st.session_state.info_title}
 
 Label:    {st.session_state.info_label}
 Catalog#: {st.session_state.info_catalog}
@@ -147,7 +147,19 @@ Tracklist:
 
             st.text_area(
                 label="Preview",
-                value=template,
-                height=536,
+                value=info_file_template,
+                height=532,
                 disabled=True
             )
+
+            st.markdown("<div class='separator-label'> </div>", unsafe_allow_html=True)
+        
+            if st.button(
+                "Save Info File",
+                key="save_info_btn",
+                type="secondary",
+                help="Save a text file with the album info",
+                use_container_width=True
+            ): create_info_file(info_file_template)
+    
+    st.markdown("<div class='separator-line'> </div>", unsafe_allow_html=True)
