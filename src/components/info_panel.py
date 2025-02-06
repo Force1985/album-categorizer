@@ -115,7 +115,8 @@ def render_info_panel():
             transformed_notes = transform_info_notes(
                 st.session_state.get('original_notes', ''),
                 st.session_state.get('original_artist', ''),
-                st.session_state.get('original_format_descriptions', [])
+                st.session_state.get('original_format_descriptions', []),
+                st.session_state.get('api_response', None)
             )
             
             info_notes = st.text_area(
