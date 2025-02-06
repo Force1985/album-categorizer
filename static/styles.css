@@ -1,5 +1,9 @@
 /* Global styles for Album Categorizer */
 
+:root {
+    --primary-color: rgb(255, 75, 75);
+  }
+
 /* Title styles */
 .custom-title {
     font-family: "Source Sans Pro", sans-serif;
@@ -9,12 +13,14 @@
 }
 
 .custom-title span {
-    color: #ff4b4b;
+    color: var(--primary-color);
 }
 
 /* Input label styles */
-label {
+label:not([disabled]) {
     max-width: 100%;
+    color: var(--primary-color) !important;
+    opacity: 0.8;
 }
 
 label > div {
@@ -36,14 +42,4 @@ label > div > p {
 .separator {
     text-align: center;
     padding-top: 30px;
-}
-
-/* Info panel styles */
-.st-key-info_notes textarea {
-    height: 38px;
-    min-height: 38px;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
 }
