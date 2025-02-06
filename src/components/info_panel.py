@@ -144,8 +144,8 @@ Format:   {st.session_state.info_format}
 Country:  {st.session_state.info_country}
 Released: {st.session_state.info_released}
 Style:    {st.session_state.info_style}
-{formatted_notes}
 Discogs:  {st.session_state.discogs_url}
+{formatted_notes}
 
 Tracklist:
 [tracklist.position]. {st.session_state.info_artist} - [tracklist.title]    [tracklist.duration]

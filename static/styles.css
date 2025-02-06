@@ -21,6 +21,9 @@ label:not([disabled]) {
     max-width: 100%;
     color: var(--primary-color) !important;
     opacity: 0.9;
+    max-height: 24px;
+    overflow: hidden;
+    align-items: flex-start;
 }
 
 label > div {
@@ -41,7 +44,7 @@ label > div > p {
 input[disabled],
 textarea[disabled] {
     font-family: 'Courier New', Courier, monospace;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 /* Separator styles */
