@@ -3,7 +3,7 @@ Artist name transformations
 """
 import re
 
-def transform_artist(artist: str) -> str:
+def transform_artist(artist: str, format_descriptions: list[str]) -> str:
     """
     Transform a single artist name
     
@@ -16,6 +16,13 @@ def transform_artist(artist: str) -> str:
     if not artist:
         return artist
         
+    # Check if 'Mixed' is in format descriptions
+    is_mixed = any(desc.lower() == 'mixed' for desc in format_descriptions)
+
+    # Return 'VA' if 'Mixed' is present
+    if is_mixed:
+        return 'VA'
+
     # Check for Various Artists variations
     if artist.lower() in ['various', 'various artists', 'v/a', 'va']:
         return 'VA'

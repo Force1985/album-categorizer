@@ -101,8 +101,8 @@ if should_fetch:
             # Apply transformations and update current values
             st.session_state.label = transform_label(raw_label)
             st.session_state.catalog = transform_catalog(raw_catalog, raw_label)
-            st.session_state.artist = transform_artist(input_artist)
-            st.session_state.title = transform_title(raw_title, raw_format_descriptions)
+            st.session_state.artist = transform_artist(input_artist, raw_format_descriptions)
+            st.session_state.title = transform_title(raw_title, raw_format_descriptions, input_artist)
             st.session_state.formats_qty = raw_format_qty
             st.session_state.formats_name = raw_format_name
             st.session_state.format_descriptions = raw_format_descriptions

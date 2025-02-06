@@ -3,7 +3,7 @@ Title transformations
 """
 import re
 
-def transform_title(title: str, format_descriptions: list[str] = None) -> str:
+def transform_title(title: str, format_descriptions: list[str] = None, artist: str = None) -> str:
     """
     Transform album title, optionally adding format information
     
@@ -23,6 +23,12 @@ def transform_title(title: str, format_descriptions: list[str] = None) -> str:
     # If no format descriptions provided, return original title
     if not format_descriptions:
         return title
+
+    # Check if 'Mixed' is in format descriptions
+    is_mixed = any(desc.lower() == 'mixed' for desc in format_descriptions)
+
+    if is_mixed and artist:
+        return f"{title} ({artist})"
         
     # Convert title to upper for comparison
     title_upper = title.upper()
