@@ -45,7 +45,7 @@ def render_folder_output():
     combined_col1, combined_col2 = st.columns([4, 1], vertical_alignment="bottom")
     with combined_col1:
         combined_output = st.text_input(
-            "Combined Name",
+            "Preview",
             value=update_combined_output(label, catalog, artist, title),
             disabled=True,
             key="combined_output"
