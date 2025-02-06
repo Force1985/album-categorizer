@@ -3,7 +3,8 @@ from ..transformations.info import (
     transform_info_artist,
     transform_info_label,
     transform_info_format,
-    transform_info_notes
+    transform_info_notes,
+    transform_info_url
 )
 
 def render_info_panel():
@@ -140,13 +141,12 @@ def render_info_panel():
             info_file_template = f"""{st.session_state.info_artist} - {st.session_state.info_title}
 
 Label:    {st.session_state.info_label}
-Catalog#: {st.session_state.info_catalog}
 Format:   {st.session_state.info_format}
 Country:  {st.session_state.info_country}
 Released: {st.session_state.info_released}
 Style:    {st.session_state.info_style}
-Discogs:  {st.session_state.discogs_url}
 {formatted_notes}
+Discogs:  {transform_info_url(st.session_state.discogs_url)}
 
 Tracklist:
 [tracklist.position]. {st.session_state.info_artist} - [tracklist.title]    [tracklist.duration]
