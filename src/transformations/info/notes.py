@@ -104,6 +104,10 @@ def transform_info_notes(notes: str, artist: str, format_descriptions: list[str]
     
     # Join artists with commas
     formatted_artist_string = ', '.join(formatted_artists)
+
+    # Handle Various Artists variations
+    if formatted_artist_string.lower() in ['various', 'various artists', 'v/a', 'va']:
+        formatted_artist_string = 'Various Artists'
     
     # Create credit line based on format
     credit_line = f"Mixed by {formatted_artist_string}." if is_mixed else f"Written & produced by {formatted_artist_string}."
