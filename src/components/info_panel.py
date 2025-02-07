@@ -1,11 +1,95 @@
+"""
+Info panel component
+"""
 import streamlit as st
 from ..transformations.info import (
     transform_info_artist,
     transform_info_label,
     transform_info_format,
     transform_info_notes,
-    transform_info_url
+    transform_info_url,
+    transform_info_tracklist
 )
+
+def render_track_editor(track: dict, index: int) -> dict:
+    """
+    Render editor for a single track
+    
+    Args:
+        track: Track data
+        index: Track index for unique keys
+        
+    Returns:
+        Updated track data
+    """
+    cols = st.columns([2, 3, 8, 3])
+    
+    with cols[0]:
+        position = st.text_input(
+            'Position',
+            value=track.get('position', ''),
+            key=f'track_position_{index}'
+        )
+    
+    with cols[1]:
+        artist = st.text_input(
+            'Artist',
+            value=track.get('artist', ''),
+            key=f'track_artist_{index}'
+        )
+    
+    with cols[2]:
+        title = st.text_input(
+            'Title',
+            value=track.get('title', ''),
+            key=f'track_title_{index}'
+        )
+    
+    with cols[3]:
+        duration = st.text_input(
+            'Duration',
+            value=track.get('duration', ''),
+            key=f'track_duration_{index}'
+        )
+    
+    # Extra artists expander
+    with st.expander('Extra Artists', expanded=False):
+        extra_artists = track.get('extra_artists', [])
+        updated_extra_artists = []
+        
+        # Add new extra artist button
+        if st.button('Add Extra Artist', key=f'add_extra_{index}'):
+            extra_artists.append({'role': '', 'name': ''})
+        
+        # Edit existing extra artists
+        for i, extra in enumerate(extra_artists):
+            cols = st.columns([1, 1])
+            with cols[0]:
+                role = st.text_input(
+                    'Role',
+                    value=extra.get('role', ''),
+                    key=f'extra_role_{index}_{i}'
+                )
+            with cols[1]:
+                name = st.text_input(
+                    'Name',
+                    value=extra.get('name', ''),
+                    key=f'extra_name_{index}_{i}'
+                )
+            
+            if role or name:  # Only add if either field has content
+                updated_extra_artists.append({
+                    'role': role,
+                    'name': name
+                })
+    
+    return {
+        'position': position,
+        'artist': artist,
+        'title': title,
+        'duration': duration,
+        'extra_artists': updated_extra_artists
+    }
 
 def render_info_panel():
     """
@@ -35,29 +119,29 @@ def render_info_panel():
                     value=st.session_state.get('original_title', ''),
                     key="info_title"
                 )
-            
-            # Second row in the nested grid
-            col3, sep2, col4 = st.columns([10, 1, 10])
 
-            with col3:
+            # Second row
+            col1, sep1, col2 = st.columns([10, 1, 10])
+
+            with col1:
                 info_label = st.text_input(
                     f"Label / API: {st.session_state.original_label}" if 'original_label' in st.session_state else "Label",
                     value=transform_info_label(st.session_state.get('original_label', '')),
                     key="info_label"
                 )
-            with sep2:
+            with sep1:
                 st.markdown("<div class='separator'> </div>", unsafe_allow_html=True)
-            with col4:
+            with col2:
                 info_catalog = st.text_input(
                     f"Catalog# / API: {st.session_state.original_catalog}" if 'original_catalog' in st.session_state else "Catalog#",
                     value=st.session_state.get('original_catalog', ''),
                     key="info_catalog"
                 )
-            
-            # Third row in the nested grid
-            col5, sep3, col6 = st.columns([10, 1, 10])
 
-            with col5:
+            # Third row
+            col1, sep1, col2 = st.columns([10, 1, 10])
+
+            with col1:
                 # Build format label parts
                 format_label_parts = []
                 if 'original_formats_qty' in st.session_state and st.session_state.original_formats_qty:
@@ -82,9 +166,9 @@ def render_info_panel():
                     value=formatted_format,
                     key="info_format"
                 )
-            with sep3:
+            with sep1:
                 st.markdown("<div class='separator'> </div>", unsafe_allow_html=True)
-            with col6:
+            with col2:
                 info_country = st.text_input(
                     f"Country / API: {st.session_state.original_country}" if 'original_country' in st.session_state else "Country",
                     value=st.session_state.get('original_country', ''),
@@ -109,23 +193,54 @@ def render_info_panel():
                     key="info_style"
                 )
             
-            # Transform notes for label display
+            # Notes
             notes_label = st.session_state.get('original_notes', '')
-
-            # Transform notes with artist credit
-            transformed_notes = transform_info_notes(
-                st.session_state.get('original_notes', ''),
-                st.session_state.get('original_artist', ''),
-                st.session_state.get('original_format_descriptions', []),
-                st.session_state.get('api_response', None)
-            )
-            
             info_notes = st.text_area(
                 f"Notes / API: {notes_label}" if notes_label else "Notes",
-                value=transformed_notes,
-                key="info_notes",
-                height=280
+                value=transform_info_notes(
+                    st.session_state.get('original_notes', ''),
+                    st.session_state.get('original_artists_sort', ''),
+                    st.session_state.get('original_format_descriptions', []),
+                    st.session_state.get('api_response', {})
+                ),
+                key='info_notes',
+                height=198
             )
+
+            # Tracklist
+            st.markdown('#### Tracklist')
+            
+            # Initialize or update tracklist in session state
+            api_response = st.session_state.get('api_response', {})
+            if 'tracklist' not in st.session_state or api_response != st.session_state.get('last_api_response'):
+                tracklist_data = transform_info_tracklist(
+                    api_response.get('tracklist', []),
+                    st.session_state.get('info_artist', '')  # Pass the album artist
+                )
+                st.session_state.tracklist = tracklist_data
+                st.session_state.last_api_response = api_response
+                
+            # Add new track button
+            if st.button('Add Track'):
+                next_position = len(st.session_state.tracklist) + 1
+                st.session_state.tracklist.append({
+                    'position': f"{next_position:02d}",
+                    'artist': '',
+                    'title': '',
+                    'duration': '',
+                    'extra_artists': []
+                })
+            
+            # Edit existing tracks
+            updated_tracklist = []
+            for i, track in enumerate(st.session_state.tracklist):
+                with st.container():
+                    # st.markdown(f'###### Track {i+1}')
+                    updated_track = render_track_editor(track, i)
+                    updated_tracklist.append(updated_track)
+            
+            # Update session state
+            st.session_state.tracklist = updated_tracklist
 
         with main_sep:
             st.markdown("<div class='separator'> </div>", unsafe_allow_html=True)
@@ -140,7 +255,7 @@ def render_info_panel():
             # Display the template
             info_file_template = f"""{st.session_state.info_artist} - {st.session_state.info_title}
 
-Label:    {st.session_state.info_label}
+Label:    {st.session_state.info_label} - {st.session_state.info_catalog}
 Format:   {st.session_state.info_format}
 Country:  {st.session_state.info_country}
 Released: {st.session_state.info_released}
@@ -148,14 +263,26 @@ Style:    {st.session_state.info_style}
 Discogs:  {transform_info_url(st.session_state.discogs_url)}
 {formatted_notes}
 
-Tracklist:
-[tracklist.position]. {st.session_state.info_artist} - [tracklist.title]    [tracklist.duration]
-    [extraartists.role] - [extraartists.name]"""
+Tracklist:"""
+
+            # Add tracks to template
+            for track in st.session_state.tracklist:
+                info_file_template += f"\n{track['position']}. "
+                if track['artist']:
+                    info_file_template += f"{track['artist']} - "
+                info_file_template += f"{track['title']}"
+                if track['duration']:
+                    info_file_template += f"    {track['duration']}"
+                    
+                # Add extra artists
+                for extra in track['extra_artists']:
+                    if extra['role'] and extra['name']:
+                        info_file_template += f"\n    {extra['role']} - {extra['name']}"
 
             st.text_area(
                 label="Preview",
                 value=info_file_template,
-                height=532,
+                height=450,
                 disabled=True
             )
 
@@ -167,6 +294,8 @@ Tracklist:
                 type="secondary",
                 help="Save a text file with the album info",
                 use_container_width=True
-            ): create_info_file(info_file_template)
+            ): 
+                # create_info_file(info_file_template)
+                pass
     
     st.markdown("<div class='separator-line'> </div>", unsafe_allow_html=True)
