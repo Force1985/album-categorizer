@@ -22,7 +22,7 @@ def render_track_editor(track: dict, index: int) -> dict:
     Returns:
         Updated track data
     """
-    cols = st.columns([2, 3, 8, 3])
+    cols = st.columns([2, 4, 8, 2])
     
     with cols[0]:
         position = st.text_input(
@@ -98,12 +98,12 @@ def render_info_panel():
     with st.container():
         st.subheader('Album Information')
 
-        # Main grid - 3 columns (21-1-21)
-        main_col1, main_sep, main_col2 = st.columns([21, 1, 21])
+        # Main grid - 3 columns (20-1-20)
+        main_col1, main_sep, main_col2 = st.columns([20, 1, 20])
 
         with main_col1:
-            # First row in the nested grid
-            col1, sep1, col2 = st.columns([10, 1, 10])
+            # First row
+            col1, col2 = st.columns([10, 10])
 
             with col1:
                 info_artist = st.text_input(
@@ -111,8 +111,6 @@ def render_info_panel():
                     value=transform_info_artist(st.session_state.get('original_artists_sort', '')),
                     key="info_artist"
                 )
-            with sep1:
-                st.markdown("<div class='separator'> </div>", unsafe_allow_html=True)
             with col2:
                 info_title = st.text_input(
                     f"Title / API: {st.session_state.original_title}" if 'original_title' in st.session_state else "Title",
@@ -121,7 +119,7 @@ def render_info_panel():
                 )
 
             # Second row
-            col1, sep1, col2 = st.columns([10, 1, 10])
+            col1, col2 = st.columns([10, 10])
 
             with col1:
                 info_label = st.text_input(
@@ -129,8 +127,6 @@ def render_info_panel():
                     value=transform_info_label(st.session_state.get('original_label', '')),
                     key="info_label"
                 )
-            with sep1:
-                st.markdown("<div class='separator'> </div>", unsafe_allow_html=True)
             with col2:
                 info_catalog = st.text_input(
                     f"Catalog# / API: {st.session_state.original_catalog}" if 'original_catalog' in st.session_state else "Catalog#",
@@ -139,7 +135,7 @@ def render_info_panel():
                 )
 
             # Third row
-            col1, sep1, col2 = st.columns([10, 1, 10])
+            col1, col2 = st.columns([10, 10])
 
             with col1:
                 # Build format label parts
@@ -166,8 +162,6 @@ def render_info_panel():
                     value=formatted_format,
                     key="info_format"
                 )
-            with sep1:
-                st.markdown("<div class='separator'> </div>", unsafe_allow_html=True)
             with col2:
                 info_country = st.text_input(
                     f"Country / API: {st.session_state.original_country}" if 'original_country' in st.session_state else "Country",
@@ -175,8 +169,8 @@ def render_info_panel():
                     key="info_country"
                 )
             
-            # Fourth row in the nested grid
-            col7, sep4, col8 = st.columns([10, 1, 10])
+            # Fourth row
+            col7, col8 = st.columns([10, 10])
             
             with col7:
                 info_released = st.text_input(
@@ -184,8 +178,6 @@ def render_info_panel():
                     value=st.session_state.get('original_released', ''),
                     key="info_released"
                 )
-            with sep4:
-                st.markdown("<div class='separator'> </div>", unsafe_allow_html=True)
             with col8:
                 info_style = st.text_input(
                     f"Style / API: {st.session_state.original_style}" if 'original_style' in st.session_state else "Style",
@@ -313,8 +305,8 @@ Tracklist:"""
             col1, col2 = st.columns([1, 1])
             with col1:
                 if st.button(
-                    "Edit Info",
-                    key="edit_info_btn",
+                    "Edit Preview",
+                    key="edit_info_preview_btn",
                     type="secondary",
                     help="Enable editing of the preview",
                     use_container_width=True
