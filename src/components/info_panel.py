@@ -256,7 +256,7 @@ def render_info_panel():
             info_file_template = f"""{st.session_state.info_artist} - {st.session_state.info_title}
 
 Label:     {st.session_state.info_label}
-Catalog:   {st.session_state.info_catalog}
+Catalog#:  {st.session_state.info_catalog}
 Format:    {st.session_state.info_format}
 Country:   {st.session_state.info_country}
 Released:  {st.session_state.info_released}
