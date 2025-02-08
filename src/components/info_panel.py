@@ -299,7 +299,6 @@ Tracklist:"""
                     if extra['role'] and extra['name']:
                         info_file_template += f"\n    {extra['role']} - {extra['name']}"
 
-            
             st.text_area(
                 label="Preview",
                 value=info_file_template,
@@ -319,5 +318,8 @@ Tracklist:"""
             ): 
                 # create_info_file(info_file_template)
                 pass
+
+            # Show preview in a sticky element
+            main_col2.write("""<div class='sticky-preview' />""", unsafe_allow_html=True)
     
     st.markdown("<div class='separator-line'> </div>", unsafe_allow_html=True)
