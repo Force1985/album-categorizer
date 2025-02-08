@@ -3,27 +3,76 @@ Tracklist transformations for info panel
 """
 import re
 from typing import List, Dict, Optional
+import requests
+
+DISCOGS_USER_AGENT = "AlbumCategorizer/1.0"
+
+def get_artist_details(resource_url: str) -> tuple[str, list[str]]:
+    """
+    Fetch artist's details from Discogs API
+    
+    Args:
+        resource_url: Artist's resource URL from Discogs API
+        
+    Returns:
+        Tuple of (realname, list of member names)
+    """
+    try:
+        headers = {'User-Agent': DISCOGS_USER_AGENT}
+        response = requests.get(resource_url, headers=headers)
+        response.raise_for_status()
+        artist_data = response.json()
+        
+        realname = artist_data.get('realname', '')
+        members = [member.get('name', '') for member in artist_data.get('members', [])]
+        # Filter out empty member names
+        members = [name for name in members if name]
+        
+        return realname, members
+    except:
+        return '', []
+
+def format_artist_with_details(artist_name: str, resource_url: str) -> str:
+    """
+    Format artist name with real name or member names if available
+    
+    Args:
+        artist_name: Artist's display name
+        resource_url: Artist's resource URL from Discogs API
+        
+    Returns:
+        Formatted artist name, potentially with real name or members in parentheses
+    """
+    realname, members = get_artist_details(resource_url)
+    
+    # If we have a realname and it's different from the artist name, use that
+    if realname and realname.strip() != artist_name.strip():
+        # Remove numbers in parentheses (e.g., "Green (2)" -> "Green")
+        artist_name = re.sub(r'\s*\(\d+\)\s*', '', artist_name).strip()
+        return f"{artist_name} ({realname})"
+    # If we have members, use those
+    elif members:
+        return f"{artist_name} ({', '.join(members)})"
+    # Otherwise just return the artist name
+    return artist_name
 
 def transform_track_artist(artist: str) -> str:
     """
-    Transform track artist name
+    Transform track artist
     
     Args:
-        artist: Track artist name from API
+        artist: Artist from API
         
     Returns:
-        Transformed track artist name
+        Transformed artist
     """
     if not artist:
         return ''
         
-    # Handle Various Artists variations
-    if artist.lower() in ['various', 'various artists', 'v/a', 'va']:
+    # Handle "Various" as "Various Artists"
+    if artist.lower() == 'various':
         return 'Various Artists'
-    
-    # Remove numbers in parentheses (e.g., "Green (2)" -> "Green")
-    artist = re.sub(r'\s*\(\d+\)\s*', '', artist).strip()
-    
+        
     return artist
 
 def transform_track_title(title: str) -> str:
@@ -31,58 +80,51 @@ def transform_track_title(title: str) -> str:
     Transform track title
     
     Args:
-        title: Track title from API
+        title: Title from API
         
     Returns:
-        Transformed track title
+        Transformed title
     """
-    if not title:
-        return ''
-    
-    # Remove numbers in parentheses
-    title = re.sub(r'\s*\(\d+\)\s*', '', title).strip()
-    
-    return title
+    return title or ''
 
 def transform_track_duration(duration: str) -> str:
     """
     Transform track duration
     
     Args:
-        duration: Track duration from API
+        duration: Duration from API
         
     Returns:
-        Transformed track duration
+        Transformed duration
     """
-    if not duration:
-        return ''
-    
-    return duration.strip()
+    return duration or ''
 
 def transform_track_extra_artists(extra_artists: List[Dict]) -> List[Dict[str, str]]:
     """
     Transform track extra artists
     
     Args:
-        extra_artists: List of extra artists from API
+        extra_artists: Extra artists from API
         
     Returns:
         List of transformed extra artists with role and name
     """
     if not extra_artists:
         return []
-    
+        
     transformed = []
     for artist in extra_artists:
-        name = artist.get('name', '').strip()
-        role = artist.get('role', '').strip()
+        name = artist.get('name', '')
+        role = artist.get('role', '')
         
+        # For Remix role, fetch and add artist details
+        if role == 'Remix' and name and artist.get('resource_url'):
+            name = format_artist_with_details(name, artist['resource_url'])
+            
         if name and role:
-            # Remove numbers in parentheses from name
-            name = re.sub(r'\s*\(\d+\)\s*', '', name).strip()
             transformed.append({
-                'name': name,
-                'role': role
+                'role': role,
+                'name': name
             })
     
     return transformed
