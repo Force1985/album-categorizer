@@ -248,20 +248,20 @@ def render_info_panel():
         with main_col2:
             # Format multi-line notes with proper indentation
             notes_content = st.session_state.info_notes.split('\n')
-            formatted_notes = 'Notes:    ' + notes_content[0]
+            formatted_notes = 'Notes:     ' + notes_content[0]
             if len(notes_content) > 1:
-                formatted_notes += '\n' + '\n'.join('          ' + line for line in notes_content[1:])
+                formatted_notes += '\n' + '\n'.join('           ' + line for line in notes_content[1:])
 
             # Display the template
             info_file_template = f"""{st.session_state.info_artist} - {st.session_state.info_title}
 
-Label:    {st.session_state.info_label}
-Catalog:  {st.session_state.info_catalog}
-Format:   {st.session_state.info_format}
-Country:  {st.session_state.info_country}
-Released: {st.session_state.info_released}
-Style:    {st.session_state.info_style}
-Discogs:  {transform_info_url(st.session_state.discogs_url)}
+Label:     {st.session_state.info_label}
+Catalog:   {st.session_state.info_catalog}
+Format:    {st.session_state.info_format}
+Country:   {st.session_state.info_country}
+Released:  {st.session_state.info_released}
+Style:     {st.session_state.info_style}
+Discogs:   {transform_info_url(st.session_state.discogs_url)}
 {formatted_notes}
 
 Tracklist:"""
@@ -299,11 +299,7 @@ Tracklist:"""
                     if extra['role'] and extra['name']:
                         info_file_template += f"\n    {extra['role']} - {extra['name']}"
 
-            # Wrap the preview in a monospace font container
-            st.markdown(
-                '<style>textarea.preview-text { font-family: monospace !important; }</style>',
-                unsafe_allow_html=True
-            )
+            
             st.text_area(
                 label="Preview",
                 value=info_file_template,

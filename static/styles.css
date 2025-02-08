@@ -43,7 +43,7 @@ label > div > p {
 
 input[disabled],
 textarea[disabled] {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: monospace;
     font-size: 12px;
 }
 
