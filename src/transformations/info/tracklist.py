@@ -1,5 +1,5 @@
 """
-Tracklist transformations for info panel
+Tracklist transformations
 """
 import re
 from typing import List, Dict, Optional

@@ -1,3 +1,6 @@
+"""
+Album Categorizer Application
+"""
 import streamlit as st
 from PIL import Image
 from src.transformations import (
@@ -124,4 +127,6 @@ if st.session_state.api_response:
 
     # Render folder output component
     render_folder_output()
+
+    # Render info panel
     render_info_panel()

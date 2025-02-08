@@ -23,9 +23,12 @@ def render_track_editor(track: dict, index: int) -> dict:
     Returns:
         Updated track data
     """
+
+    # Main grid
     cols = st.columns([2, 4, 8, 2])
     
     with cols[0]:
+        # Position input
         position = st.text_input(
             'Position',
             value=track.get('position', ''),
@@ -33,6 +36,7 @@ def render_track_editor(track: dict, index: int) -> dict:
         )
     
     with cols[1]:
+        # Artist input
         artist = st.text_input(
             'Artist',
             value=track.get('artist', ''),
@@ -40,6 +44,7 @@ def render_track_editor(track: dict, index: int) -> dict:
         )
     
     with cols[2]:
+        # Title input
         title = st.text_input(
             'Title',
             value=track.get('title', ''),
@@ -47,6 +52,7 @@ def render_track_editor(track: dict, index: int) -> dict:
         )
     
     with cols[3]:
+        # Duration input
         duration = st.text_input(
             'Duration',
             value=track.get('duration', ''),
@@ -66,12 +72,14 @@ def render_track_editor(track: dict, index: int) -> dict:
         for i, extra in enumerate(extra_artists):
             cols = st.columns([1, 1])
             with cols[0]:
+                # Role input
                 role = st.text_input(
                     'Role',
                     value=extra.get('role', ''),
                     key=f'extra_role_{index}_{i}'
                 )
             with cols[1]:
+                # Name input
                 name = st.text_input(
                     'Name',
                     value=extra.get('name', ''),
@@ -99,7 +107,7 @@ def render_info_panel():
     with st.container():
         st.subheader('Album Information')
 
-        # Main grid - 3 columns (20-1-20)
+        # Main grid
         main_col1, main_sep, main_col2 = st.columns([20, 1, 20])
 
         with main_col1:
@@ -107,12 +115,15 @@ def render_info_panel():
             col1, col2 = st.columns([10, 10])
 
             with col1:
+                # Artist input
                 info_artist = st.text_input(
                     f"Artist / API: {st.session_state.original_artists_sort}" if 'original_artists_sort' in st.session_state else "Artist",
                     value=transform_info_artist(st.session_state.get('original_artists_sort', '')),
                     key="info_artist"
                 )
+
             with col2:
+                # Title input
                 info_title = st.text_input(
                     f"Title / API: {st.session_state.original_title}" if 'original_title' in st.session_state else "Title",
                     value=st.session_state.get('original_title', ''),
@@ -123,12 +134,14 @@ def render_info_panel():
             col1, col2 = st.columns([10, 10])
 
             with col1:
+                # Label input
                 info_label = st.text_input(
                     f"Label / API: {st.session_state.original_label}" if 'original_label' in st.session_state else "Label",
                     value=transform_info_label(st.session_state.get('original_label', '')),
                     key="info_label"
                 )
             with col2:
+                # Catalog number input
                 info_catalog = st.text_input(
                     f"Catalog# / API: {st.session_state.original_catalog}" if 'original_catalog' in st.session_state else "Catalog#",
                     value=st.session_state.get('original_catalog', ''),
@@ -158,12 +171,16 @@ def render_info_panel():
                     st.session_state.get('format_descriptions', []),
                     st.session_state.get('format_text', '')
                 )
+
+                # Format input
                 info_format = st.text_input(
                     format_label,
                     value=formatted_format,
                     key="info_format"
                 )
+
             with col2:
+                # Country input
                 info_country = st.text_input(
                     f"Country / API: {st.session_state.original_country}" if 'original_country' in st.session_state else "Country",
                     value=st.session_state.get('original_country', ''),
@@ -174,19 +191,22 @@ def render_info_panel():
             col7, col8 = st.columns([10, 10])
             
             with col7:
+                # Released input
                 info_released = st.text_input(
                     f"Released / API: {st.session_state.original_released}" if 'original_released' in st.session_state else "Released",
                     value=st.session_state.get('original_released', ''),
                     key="info_released"
                 )
+
             with col8:
+                # Style input
                 info_style = st.text_input(
                     f"Style / API: {st.session_state.original_style}" if 'original_style' in st.session_state else "Style",
                     value=st.session_state.get('original_style', ''),
                     key="info_style"
                 )
             
-            # Notes
+            # Notes input
             notes_label = st.session_state.get('original_notes', '')
             info_notes = st.text_area(
                 f"Notes / API: {notes_label}" if notes_label else "Notes",
@@ -292,6 +312,7 @@ Tracklist:"""
                     if extra['role'] and extra['name']:
                         info_file_template += f"\n    {extra['role']} - {extra['name']}"
 
+            # Preview section
             st.text_area(
                 label="Preview",
                 value=info_file_template,
@@ -304,7 +325,9 @@ Tracklist:"""
             st.markdown("<div class='separator-label'> </div>", unsafe_allow_html=True)
         
             col1, col2 = st.columns([1, 1])
+
             with col1:
+                # Edit preview button
                 if st.button(
                     "Edit Preview",
                     key="edit_info_preview_btn",
@@ -316,6 +339,7 @@ Tracklist:"""
                     st.rerun()
                     
             with col2:
+                # Save info file button
                 if st.button(
                     "Save Info File",
                     key="save_info_btn",

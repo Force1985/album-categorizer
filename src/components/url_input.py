@@ -1,14 +1,18 @@
+"""
+URL input component
+"""
 import streamlit as st
 from ..api.discogs import fetch_discogs_data
 from ..utils.file_operations import create_album_folder
 
 def render_url_input():
     """Render the URL input component"""
-    # Create a row for the input field and button using columns
-    col1, col2 = st.columns([16, 5], vertical_alignment="bottom") # 16:5 ratio for input:separator:button
 
-    # Input field in the first (wider) column
+    # Main grid
+    col1, col2 = st.columns([16, 5], vertical_alignment="bottom")
+
     with col1:
+        # Input field
         discogs_url = st.text_input(
             label="Discogs URL",
             placeholder="https://www.discogs.com/release/...",
@@ -17,8 +21,8 @@ def render_url_input():
             value="https://www.discogs.com/release/139061-DJ-Antoine-Visit-Me"
         )
 
-    # Button in the second (narrower) column
     with col2:
+        # Fetch button
         fetch_button = st.button(
             "Fetch Data",
             type="primary",

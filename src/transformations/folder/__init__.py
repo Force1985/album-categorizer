@@ -1,5 +1,5 @@
 """
-Folder name transformations
+Folder name specific transformations
 """
 from .artist import transform_artist
 from .catalog import transform_catalog

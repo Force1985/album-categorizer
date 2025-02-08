@@ -1,3 +1,6 @@
+"""
+File operations utilities
+"""
 import os
 import streamlit as st
 

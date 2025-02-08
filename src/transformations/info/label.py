@@ -1,5 +1,5 @@
 """
-Label name transformations for info panel
+Label name transformations
 """
 import re
 

@@ -41,6 +41,7 @@ label > div > p {
     padding: 0;
 }
 
+/* Input styles */
 .st-key-combined_output input,
 .st-key-preview-text textarea {
     font-family: monospace;
@@ -64,13 +65,13 @@ label > div > p {
 }
 
 /* Sticky preview */
-div[data-testid="stVerticalBlock"] div:has(div.sticky-preview) {
+[data-testid="stVerticalBlock"] div:has(.sticky-preview) {
     position: sticky;
     top: 3.5rem;
     margin-bottom: calc(3.5rem / 3);
     z-index: 1;
 }
 
-div.sticky-preview {
+.sticky-preview {
     display: none;
 }
