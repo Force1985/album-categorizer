@@ -53,18 +53,32 @@ def render_folder_output():
         combined_output = st.text_input(
             "Preview",
             value=update_combined_output(label, catalog, artist, title),
-            disabled=True,
-            key="combined_output"
+            disabled=st.session_state.get('folder_preview_disabled', True),
+            key="combined_output",
+            help="Preview of the file/folder name"
         )
 
         st.markdown("<div class='separator-label'> </div>", unsafe_allow_html=True)
         
-        if st.button(
-            "Save Folder",
-            key="save_folder_btn",
-            type="secondary",
-            help="Create a folder for the album in the export directory",
-            use_container_width=True
-        ): create_album_folder(combined_output)
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            if st.button(
+                "Edit Folder Name",
+                key="edit_folder_btn",
+                type="secondary",
+                help="Enable editing of the preview",
+                use_container_width=True
+            ):
+                st.session_state.folder_preview_disabled = False
+                st.rerun()
+                
+        with col2:
+            if st.button(
+                "Save Folder",
+                key="save_folder_btn",
+                type="primary",
+                help="Create a folder for the album in the export directory",
+                use_container_width=True
+            ): create_album_folder(combined_output)
     
     st.markdown("<div class='separator-line'></div>", unsafe_allow_html=True)

@@ -19,6 +19,11 @@ def render_url_input():
 
     # Button in the second (narrower) column
     with col2:
-        fetch_button = st.button("Fetch Data", type="primary", use_container_width=True)
+        fetch_button = st.button(
+            "Fetch Data",
+            type="primary",
+            help="Fetch album data from Discogs",
+            use_container_width=True
+        )
 
     return discogs_url, fetch_button

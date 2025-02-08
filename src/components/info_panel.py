@@ -303,21 +303,35 @@ Tracklist:"""
                 label="Preview",
                 value=info_file_template,
                 height=450,
-                disabled=True,
-                key="preview-text"
+                disabled=st.session_state.get('info_preview_disabled', True),
+                key="preview-text",
+                help="Preview of the info file"
             )
 
             st.markdown("<div class='separator-label'> </div>", unsafe_allow_html=True)
         
-            if st.button(
-                "Save Info File",
-                key="save_info_btn",
-                type="secondary",
-                help="Save a text file with the album info",
-                use_container_width=True
-            ): 
-                # create_info_file(info_file_template)
-                pass
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                if st.button(
+                    "Edit Info",
+                    key="edit_info_btn",
+                    type="secondary",
+                    help="Enable editing of the preview",
+                    use_container_width=True
+                ):
+                    st.session_state.info_preview_disabled = False
+                    st.rerun()
+                    
+            with col2:
+                if st.button(
+                    "Save Info File",
+                    key="save_info_btn",
+                    type="primary",
+                    help="Save a text file with the album info",
+                    use_container_width=True
+                ): 
+                    # create_info_file(info_file_template)
+                    pass
 
             # Show preview in a sticky element
             main_col2.write("""<div class='sticky-preview' />""", unsafe_allow_html=True)
