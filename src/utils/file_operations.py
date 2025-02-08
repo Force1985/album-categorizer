@@ -28,10 +28,15 @@ def create_info_file(folder_name, content):
     
     # Get export directory
     export_dir = os.path.join(current_dir, 'export', folder_name)
+
+    # Create export directory if it doesn't exist
+    if not os.path.exists(export_dir):
+        os.makedirs(export_dir)
     
     # Create info file path
     info_file_path = os.path.join(export_dir, f"{folder_name}.txt")
     
+    # Check if the file already exists
     try:
         with open(info_file_path, 'w', encoding='utf-8') as f:
             f.write(content)
