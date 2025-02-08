@@ -10,6 +10,7 @@ from ..transformations.info import (
     transform_info_url,
     transform_info_tracklist
 )
+from ..utils.file_operations import create_info_file
 
 def render_track_editor(track: dict, index: int) -> dict:
     """
@@ -322,9 +323,10 @@ Tracklist:"""
                     help="Save a text file with the album info",
                     use_container_width=True
                 ): 
-                    # create_info_file(info_file_template)
-                    pass
-
+                    # Get folder name from session state
+                    folder_name = f"{st.session_state.label} {st.session_state.catalog} - {st.session_state.artist} - {st.session_state.title}"
+                    create_info_file(folder_name, info_file_template)
+                    
             # Show preview in a sticky element
             main_col2.write("""<div class='sticky-preview' />""", unsafe_allow_html=True)
     
