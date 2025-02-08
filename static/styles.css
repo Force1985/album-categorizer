@@ -58,6 +58,10 @@ label > div > p {
     padding-top: 28px;
 }
 
+.separator-label--sm {
+    padding-top: 16px;
+}
+
 .separator-line {
     border-bottom: 1px solid var(--primary-color);
     padding-bottom: 30px;
@@ -65,10 +69,9 @@ label > div > p {
 }
 
 /* Sticky preview */
-[data-testid="stVerticalBlock"] div:has(.sticky-preview) {
+[data-testid="stVerticalBlock"] > div > div > div div:has(.sticky-preview) {
     position: sticky;
     top: 3.5rem;
-    margin-bottom: calc(3.5rem / 3);
     z-index: 1;
 }
 

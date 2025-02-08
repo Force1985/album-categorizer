@@ -217,7 +217,7 @@ def render_info_panel():
                     st.session_state.get('api_response', {})
                 ),
                 key='info_notes',
-                height=198
+                height=202
             )
 
             # Tracklist
@@ -322,11 +322,14 @@ Tracklist:"""
                 help="Preview of the info file"
             )
 
-            st.markdown("<div class='separator-label'> </div>", unsafe_allow_html=True)
+            st.markdown("<div class='separator-label separator-label--sm'> </div>", unsafe_allow_html=True)
         
             col1, col2 = st.columns([1, 1])
 
             with col1:
+                # Show preview in a sticky element
+                st.markdown("<div class='sticky-preview'> </div>", unsafe_allow_html=True)
+
                 # Edit preview button
                 if st.button(
                     "Edit Preview",
@@ -339,6 +342,9 @@ Tracklist:"""
                     st.rerun()
                     
             with col2:
+                # Show preview in a sticky element
+                st.markdown("<div class='sticky-preview'> </div>", unsafe_allow_html=True)
+
                 # Save info file button
                 if st.button(
                     "Save Info File",
@@ -350,8 +356,5 @@ Tracklist:"""
                     # Get folder name from session state
                     folder_name = f"{st.session_state.label} {st.session_state.catalog} - {st.session_state.artist} - {st.session_state.title}"
                     create_info_file(folder_name, info_file_template)
-                    
-            # Show preview in a sticky element
-            main_col2.write("""<div class='sticky-preview' />""", unsafe_allow_html=True)
     
     st.markdown("<div class='separator-line'> </div>", unsafe_allow_html=True)
