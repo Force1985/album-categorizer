@@ -41,8 +41,8 @@ label > div > p {
     padding: 0;
 }
 
-input[disabled],
-textarea[disabled] {
+.st-key-combined_output input,
+.st-key-preview-text textarea {
     font-family: monospace;
     font-size: 12px;
 }
