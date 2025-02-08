@@ -18,7 +18,7 @@ def render_url_input():
             placeholder="https://www.discogs.com/release/...",
             help="Paste a Discogs album URL here",
             key="url_input",
-            value="https://www.discogs.com/release/139061-DJ-Antoine-Visit-Me"
+            value="https://www.discogs.com/release/6817-DJ-Slip-Outward-EP"
         )
 
     with col2:

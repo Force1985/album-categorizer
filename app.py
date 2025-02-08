@@ -12,6 +12,7 @@ from src.transformations import (
 from src.components.url_input import render_url_input
 from src.components.folder_output import render_folder_output
 from src.components.info_panel import render_info_panel
+from src.components.file_manager import render_file_manager
 from src.api.discogs import fetch_discogs_data
 
 # Load custom favicon
@@ -42,6 +43,15 @@ for key in ['label', 'catalog', 'artist', 'title', 'country', 'formats_qty', 'fo
 for key in ['format_descriptions']:
     if key not in st.session_state:
         st.session_state[key] = []
+
+def reset_file_manager_state():
+    """Reset file manager related session state variables"""
+    if 'track_file_pairs' in st.session_state:
+        del st.session_state.track_file_pairs
+    if 'track_filename_edits' in st.session_state:
+        del st.session_state.track_filename_edits
+    if 'file_uploader_key' in st.session_state:
+        st.session_state.file_uploader_key += 1
 
 # Main title and description
 st.markdown("<h1 class='custom-title'>Album Categorizer <span>♪</span></h1>", unsafe_allow_html=True)
@@ -116,6 +126,9 @@ if should_fetch:
             st.session_state.notes = raw_notes
             st.session_state.discogs_url = discogs_url
 
+            # Reset file manager state
+            reset_file_manager_state()
+
 # API Response Debug Section (always visible if we have a response)
 if st.session_state.api_response:
     with st.expander("🔍 View API Response Details"):
@@ -130,3 +143,6 @@ if st.session_state.api_response:
 
     # Render info panel
     render_info_panel()
+
+    # Render file manager
+    render_file_manager()
