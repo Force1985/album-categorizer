@@ -255,7 +255,8 @@ def render_info_panel():
             # Display the template
             info_file_template = f"""{st.session_state.info_artist} - {st.session_state.info_title}
 
-Label:    {st.session_state.info_label} - {st.session_state.info_catalog}
+Label:    {st.session_state.info_label}
+Catalog:  {st.session_state.info_catalog}
 Format:   {st.session_state.info_format}
 Country:  {st.session_state.info_country}
 Released: {st.session_state.info_released}
@@ -265,25 +266,50 @@ Discogs:  {transform_info_url(st.session_state.discogs_url)}
 
 Tracklist:"""
 
+            # Calculate the length of the longest title line
+            max_line_length = 0
+            for track in st.session_state.tracklist:
+                line_length = len(f"{track['position']}. ")
+                if track['artist']:
+                    line_length += len(track['artist']) + 3  # +3 for " - "
+                line_length += len(track['title'])
+                max_line_length = max(max_line_length, line_length)
+            
+            # Add 4 spaces padding after the longest line
+            duration_position = max_line_length + 4
+
             # Add tracks to template
             for track in st.session_state.tracklist:
-                info_file_template += f"\n{track['position']}. "
+                # Start with position and title
+                line = f"\n{track['position']}. "
                 if track['artist']:
-                    info_file_template += f"{track['artist']} - "
-                info_file_template += f"{track['title']}"
+                    line += f"{track['artist']} - "
+                line += track['title']
+                
+                # Add padding to align duration
                 if track['duration']:
-                    info_file_template += f"    {track['duration']}"
-                    
+                    current_length = len(line)
+                    padding = " " * (duration_position - current_length)
+                    line += f"{padding}{track['duration']}"
+                
+                info_file_template += line
+                
                 # Add extra artists
                 for extra in track['extra_artists']:
                     if extra['role'] and extra['name']:
                         info_file_template += f"\n    {extra['role']} - {extra['name']}"
 
+            # Wrap the preview in a monospace font container
+            st.markdown(
+                '<style>textarea.preview-text { font-family: monospace !important; }</style>',
+                unsafe_allow_html=True
+            )
             st.text_area(
                 label="Preview",
                 value=info_file_template,
                 height=450,
-                disabled=True
+                disabled=True,
+                key="preview-text"
             )
 
             st.markdown("<div class='separator-label'> </div>", unsafe_allow_html=True)
