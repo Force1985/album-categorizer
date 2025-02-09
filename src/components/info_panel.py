@@ -64,10 +64,6 @@ def render_track_editor(track: dict, index: int) -> dict:
         extra_artists = track.get('extra_artists', [])
         updated_extra_artists = []
         
-        # Add new extra artist button
-        if st.button('Add Extra Artist', key=f'add_extra_{index}'):
-            extra_artists.append({'role': '', 'name': ''})
-        
         # Edit existing extra artists
         for i, extra in enumerate(extra_artists):
             cols = st.columns([1, 1])
@@ -232,23 +228,11 @@ def render_info_panel():
                 )
                 st.session_state.tracklist = tracklist_data
                 st.session_state.last_api_response = api_response
-                
-            # Add new track button
-            if st.button('Add Track'):
-                next_position = len(st.session_state.tracklist) + 1
-                st.session_state.tracklist.append({
-                    'position': f"{next_position:02d}",
-                    'artist': '',
-                    'title': '',
-                    'duration': '',
-                    'extra_artists': []
-                })
             
             # Edit existing tracks
             updated_tracklist = []
             for i, track in enumerate(st.session_state.tracklist):
                 with st.container():
-                    # st.markdown(f'###### Track {i+1}')
                     updated_track = render_track_editor(track, i)
                     updated_tracklist.append(updated_track)
             
