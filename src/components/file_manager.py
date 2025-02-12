@@ -39,6 +39,7 @@ def render_file_manager():
     )
 
     if not uploaded_files:
+        st.markdown("<div class='separator-line'> </div>", unsafe_allow_html=True)
         return
 
     main_col1, main_sep, main_col2 = st.columns([26, 1, 14])
@@ -131,3 +132,5 @@ def render_file_manager():
                 use_container_width=True
             ):
                 st.info("File renaming will be implemented in the next step")
+
+    st.markdown("<div class='separator-line'> </div>", unsafe_allow_html=True)
