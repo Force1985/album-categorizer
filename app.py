@@ -13,6 +13,7 @@ from src.components.url_input import render_url_input
 from src.components.folder_output import render_folder_output
 from src.components.info_panel import render_info_panel
 from src.components.file_manager import render_file_manager
+from src.components.streaming_services import render_streaming_services
 from src.api.discogs import fetch_discogs_data
 
 # Load custom favicon
@@ -146,3 +147,6 @@ if st.session_state.api_response:
 
     # Render file manager
     render_file_manager()
+    
+    # Render streaming services
+    render_streaming_services()

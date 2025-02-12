@@ -1,3 +1,6 @@
+"""
+Discogs API integration module
+"""
 import requests
 import re
 
