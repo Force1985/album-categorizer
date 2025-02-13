@@ -25,7 +25,7 @@ def render_track_editor(track: dict, index: int) -> dict:
     """
 
     # Main grid
-    cols = st.columns([2, 4, 8, 2])
+    cols = st.columns([2, 5, 7, 2])
     
     with cols[0]:
         # Position input

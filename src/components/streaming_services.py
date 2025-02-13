@@ -106,8 +106,18 @@ def render_streaming_services():
                 if not has_album:
                     st.info('Load an album first to search on Spotify')
                 else:
-                    if st.button('Search this album on Spotify', key='spotify_search'):
-                        search_spotify_album()
+                    col1, col2 = st.columns([8, 4], vertical_alignment="center")
+
+                    with col1:
+                        st.markdown('##### Spotify')
+
+                    with col2:
+                        if st.button(
+                            'Search this album on Spotify',
+                            key='spotify_search',
+                            use_container_width=True
+                        ):
+                            search_spotify_album()
                     
                     # Display search results
                     if st.session_state.spotify_search_results:
@@ -118,7 +128,7 @@ def render_streaming_services():
 
         with main_col2:
             # Tidal section (placeholder)
-            st.markdown('#### Tidal')
+            st.markdown('##### Tidal')
             st.info('Coming soon...')
 
     st.markdown("<div class='separator-line'> </div>", unsafe_allow_html=True)

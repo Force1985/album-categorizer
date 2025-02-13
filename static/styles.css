@@ -53,6 +53,12 @@ label > div > p {
     width: 100%;
 }
 
+[data-testid="stBaseButton"],
+[data-testid="stBaseButton-secondary"],
+.stButton-fake {
+    white-space: nowrap;
+}
+
 .stButton-fake {
     display: inline-flex;
     -webkit-box-align: center;
