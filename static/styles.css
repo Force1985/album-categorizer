@@ -53,6 +53,38 @@ label > div > p {
     width: 100%;
 }
 
+.stButton-fake {
+    display: inline-flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    font-weight: 400;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    min-height: 2.5rem;
+    margin: 0px;
+    line-height: 1.6;
+    text-transform: none;
+    font-size: inherit;
+    font-family: inherit;
+    color: inherit;
+    width: 100%;
+    cursor: pointer;
+    user-select: none;
+    background-color: rgb(19, 23, 32);
+    border: 1px solid rgba(250, 250, 250, 0.2);
+    cursor: pointer;
+    color: white !important;
+    text-decoration: none !important;
+} 
+
+.stButton-fake:hover {
+    border-color: rgb(255, 75, 75);
+    color: rgb(255, 75, 75) !important;
+}
+
+
 /* Separator styles */
 .separator {
     text-align: center;

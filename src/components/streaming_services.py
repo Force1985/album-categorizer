@@ -40,12 +40,10 @@ def render_spotify_results():
     """Render Spotify search results"""
     if not st.session_state.spotify_search_results:
         return
-        
-    st.markdown('###### Found on Spotify')
     
     for album in st.session_state.spotify_search_results:
         with st.container():
-            col1, col2 = st.columns([1, 7])
+            col1, col2, col3 = st.columns([3, 14, 5], vertical_alignment="center")
             
             # Album cover
             with col1:
@@ -58,37 +56,26 @@ def render_spotify_results():
                 # Artist and album info
                 artists = album.get('artists', [])
                 artist_names = ', '.join(artist['name'] for artist in artists)
-                st.markdown(f'**{artist_names}** - {album.get("name")}')
-                
-                # Additional details
-                details = []
                 if album.get('release_date'):
-                    details.append(f'Released: {album["release_date"]}')
+                    release_date = album["release_date"]
                 if album.get('total_tracks'):
-                    details.append(f'Tracks: {album["total_tracks"]}')
-                
-                st.markdown(' | '.join(details))
-                
-                # Action buttons
-                # col3, col4 = st.columns(2)
-                
+                    total_tracks = album["total_tracks"]
+                st.info(
+                    f'**{artist_names}** - {album.get("name")}  \nReleased: {release_date}  \nTracks: {total_tracks}'
+                )
+            
+            # Artist details
+            with col3:
                 # Album button
-                # with col3:
                 if album.get('external_urls', {}).get('spotify'):
                     st.markdown(
-                        f'<a href="{album["external_urls"]["spotify"]}" target="_blank">'
-                        '<button style="width: 100%;">Open Album</button>'
-                        '</a>', 
+                        f'<a href="{album["external_urls"]["spotify"]}" target="_blank" class="stButton-fake">Open Album</a>', 
                         unsafe_allow_html=True
                     )
-                
                 # Artist button
-                # with col4:
                 if artists and artists[0].get('external_urls', {}).get('spotify'):
                     st.markdown(
-                        f'<a href="{artists[0]["external_urls"]["spotify"]}" target="_blank">'
-                        '<button style="width: 100%;">Open Artist</button>'
-                        '</a>', 
+                        f'<a href="{artists[0]["external_urls"]["spotify"]}" target="_blank" class="stButton-fake">Open Artist</a>', 
                         unsafe_allow_html=True
                     )
 
@@ -101,12 +88,11 @@ def render_streaming_services():
     with st.container():
         st.subheader('Streaming Services')
 
-        col1, sep, col2 = st.columns([20, 1, 20])
+        main_col1, main_sep, main_col2 = st.columns([20, 1, 20])
         
-        with col1:
+        with main_col1:
             # Spotify section
-            st.markdown('#### Spotify')
-            
+
             # Check if Spotify credentials are available
             if not (st.session_state.spotify_client_id and st.session_state.spotify_client_secret):
                 st.warning('Please provide your Spotify API credentials in Settings.')
@@ -120,17 +106,17 @@ def render_streaming_services():
                 if not has_album:
                     st.info('Load an album first to search on Spotify')
                 else:
-                    if st.button('Search on Spotify', key='spotify_search'):
+                    if st.button('Search this album on Spotify', key='spotify_search'):
                         search_spotify_album()
                     
                     # Display search results
                     if st.session_state.spotify_search_results:
                         render_spotify_results()
             
-        with sep:
+        with main_sep:
             st.markdown("<div class='separator'> </div>", unsafe_allow_html=True)
 
-        with col2:
+        with main_col2:
             # Tidal section (placeholder)
             st.markdown('#### Tidal')
             st.info('Coming soon...')
