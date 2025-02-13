@@ -6,71 +6,46 @@ from src.api.spotify import init_spotify_api
 
 def init_streaming_state():
     """Initialize streaming services related session state variables"""
-    if 'spotify_client_id' not in st.session_state:
-        st.session_state.spotify_client_id = ''
-    if 'spotify_client_secret' not in st.session_state:
-        st.session_state.spotify_client_secret = ''
-    if 'spotify_connected' not in st.session_state:
-        st.session_state.spotify_connected = False
     if 'spotify_search_results' not in st.session_state:
         st.session_state.spotify_search_results = None
 
-def handle_spotify_connect():
-    """Handle Spotify connect button click"""
-    spotify = init_spotify_api()
-    if spotify:
-        # Test connection by getting access token
-        access_token = spotify.get_access_token()
-        if access_token:
-            st.session_state.spotify_connected = True
-            st.success('Successfully connected to Spotify!')
-        else:
-            st.error('Failed to connect to Spotify. Please check your credentials.')
-    else:
-        st.error('Please enter your Spotify credentials first.')
-
-def handle_spotify_disconnect():
-    """Handle Spotify disconnect button click"""
-    st.session_state.spotify_connected = False
-    st.session_state.spotify_client_id = ''
-    st.session_state.spotify_client_secret = ''
-    st.session_state.spotify_search_results = None
-    st.success('Disconnected from Spotify.')
-
 def search_spotify_album():
     """Search for album on Spotify using Discogs data"""
-    if not st.session_state.spotify_connected:
-        return
-        
     # Get Discogs data from session state
-    artists_sort = st.session_state.get('original_artists_sort')
-    title = st.session_state.get('original_title')
+    artist = st.session_state.original_artist
+    title = st.session_state.original_title
     
-    if not artists_sort or not title:
+    if not artist or not title:
+        st.error('Album data not found')
         return
         
     # Create search query
-    query = f'artist:{artists_sort} album:{title}'
+    query = f'artist:{artist} album:{title}'
     
     # Search on Spotify
     spotify = init_spotify_api()
-    if spotify:
-        albums, error = spotify.search_album(query)
-        if error:
-            st.error(f'Failed to search Spotify: {error}')
-        else:
-            st.session_state.spotify_search_results = albums
+    if not spotify:
+        st.error('Failed to connect to Spotify. Please check your credentials in Settings.')
+        return
+        
+    albums, error = spotify.search_album(query)
+    if error:
+        st.error(f'Failed to search Spotify: {error}')
+    else:
+        st.session_state.spotify_search_results = albums
+
+
 
 def render_spotify_results():
     """Render Spotify search results"""
     if not st.session_state.spotify_search_results:
         return
         
-    st.markdown('#### Found on Spotify')
+    st.markdown('###### Found on Spotify')
     
     for album in st.session_state.spotify_search_results:
         with st.container():
-            col1, col2 = st.columns([1, 4])
+            col1, col2 = st.columns([1, 7])
             
             # Album cover
             with col1:
@@ -80,8 +55,10 @@ def render_spotify_results():
             
             # Album details
             with col2:
-                artists = ', '.join(artist['name'] for artist in album.get('artists', []))
-                st.markdown(f'**{artists}** - {album.get("name")}')
+                # Artist and album info
+                artists = album.get('artists', [])
+                artist_names = ', '.join(artist['name'] for artist in artists)
+                st.markdown(f'**{artist_names}** - {album.get("name")}')
                 
                 # Additional details
                 details = []
@@ -89,10 +66,31 @@ def render_spotify_results():
                     details.append(f'Released: {album["release_date"]}')
                 if album.get('total_tracks'):
                     details.append(f'Tracks: {album["total_tracks"]}')
-                if album.get('external_urls', {}).get('spotify'):
-                    details.append(f'[Open in Spotify]({album["external_urls"]["spotify"]})')
                 
                 st.markdown(' | '.join(details))
+                
+                # Action buttons
+                # col3, col4 = st.columns(2)
+                
+                # Album button
+                # with col3:
+                if album.get('external_urls', {}).get('spotify'):
+                    st.markdown(
+                        f'<a href="{album["external_urls"]["spotify"]}" target="_blank">'
+                        '<button style="width: 100%;">Open Album</button>'
+                        '</a>', 
+                        unsafe_allow_html=True
+                    )
+                
+                # Artist button
+                # with col4:
+                if artists and artists[0].get('external_urls', {}).get('spotify'):
+                    st.markdown(
+                        f'<a href="{artists[0]["external_urls"]["spotify"]}" target="_blank">'
+                        '<button style="width: 100%;">Open Artist</button>'
+                        '</a>', 
+                        unsafe_allow_html=True
+                    )
 
 def render_streaming_services():
     """
@@ -102,61 +100,40 @@ def render_streaming_services():
     
     with st.container():
         st.subheader('Streaming Services')
+
+        col1, sep, col2 = st.columns([20, 1, 20])
         
-        # Spotify section
-        st.markdown('#### Spotify')
-        
-        # Spotify credentials input
-        if not st.session_state.spotify_connected:
-            col1, col2 = st.columns(2)
-            with col1:
-                client_id = st.text_input(
-                    'Client ID',
-                    value=st.session_state.spotify_client_id,
-                    type='password',
-                    key='spotify_client_id_input'
-                )
-                st.session_state.spotify_client_id = client_id
+        with col1:
+            # Spotify section
+            st.markdown('#### Spotify')
             
-            with col2:
-                client_secret = st.text_input(
-                    'Client Secret',
-                    value=st.session_state.spotify_client_secret,
-                    type='password',
-                    key='spotify_client_secret_input'
+            # Check if Spotify credentials are available
+            if not (st.session_state.spotify_client_id and st.session_state.spotify_client_secret):
+                st.warning('Please provide your Spotify API credentials in Settings.')
+            else:
+                # Show search button if we have album data
+                has_album = (
+                    'original_artist' in st.session_state and
+                    'original_title' in st.session_state
                 )
-                st.session_state.spotify_client_secret = client_secret
-        
-        # Spotify connection buttons
-        col3, col4 = st.columns(2)
-        with col3:
-            if st.button(
-                'Connect Spotify',
-                key='spotify_connect',
-                disabled=st.session_state.spotify_connected
-            ):
-                handle_spotify_connect()
-                if st.session_state.spotify_connected:
-                    search_spotify_album()
-        with col4:
-            if st.button(
-                'Disconnect',
-                key='spotify_disconnect',
-                disabled=not st.session_state.spotify_connected
-            ):
-                handle_spotify_disconnect()
-        
-        # Display Spotify search results
-        if st.session_state.spotify_connected:
-            render_spotify_results()
+                
+                if not has_album:
+                    st.info('Load an album first to search on Spotify')
+                else:
+                    if st.button('Search on Spotify', key='spotify_search'):
+                        search_spotify_album()
+                    
+                    # Display search results
+                    if st.session_state.spotify_search_results:
+                        render_spotify_results()
             
-        # Tidal section
-        st.markdown('#### Tidal')
-        col5, col6 = st.columns(2)
-        with col5:
-            st.button('Connect Tidal', key='tidal_connect')
-        with col6:
-            st.button('Disconnect', key='tidal_disconnect', disabled=True)
+        with sep:
+            st.markdown("<div class='separator'> </div>", unsafe_allow_html=True)
+
+        with col2:
+            # Tidal section (placeholder)
+            st.markdown('#### Tidal')
+            st.info('Coming soon...')
 
     st.markdown("<div class='separator-line'> </div>", unsafe_allow_html=True)
 
