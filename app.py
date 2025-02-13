@@ -14,6 +14,7 @@ from src.components.folder_output import render_folder_output
 from src.components.info_panel import render_info_panel
 from src.components.file_manager import render_file_manager
 from src.components.streaming_services import render_streaming_services
+from src.components.settings_modal import init_settings, render_settings
 from src.api.discogs import fetch_discogs_data
 
 # Load custom favicon
@@ -54,9 +55,17 @@ def reset_file_manager_state():
     if 'file_uploader_key' in st.session_state:
         st.session_state.file_uploader_key += 1
 
-# Main title and description
-st.markdown("<h1 class='custom-title'>Album Categorizer <span>♪</span></h1>", unsafe_allow_html=True)
-st.write("Fetch and organize your favorite albums from Discogs with ease.")
+# Initialize settings
+init_settings()
+
+col1, col2 = st.columns([32, 5])
+with col1:
+    # Main title and description
+    st.markdown("<h1 class='custom-title'>Album Categorizer <span>♪</span></h1>", unsafe_allow_html=True)
+    st.write("Fetch and organize your favorite albums from Discogs with ease.")
+with col2:
+    # Settings button
+    render_settings()
 
 # Render URL input component
 discogs_url, fetch_button = render_url_input()

@@ -3,6 +3,7 @@ Discogs API integration module
 """
 import requests
 import re
+import streamlit as st
 
 DISCOGS_API_URL = "https://api.discogs.com"
 DISCOGS_USER_AGENT = "AlbumCategorizer/1.0"
@@ -19,9 +20,10 @@ def fetch_discogs_data(url):
     if not release_id:
         return None, None, "Invalid Discogs URL. Please use a release URL (e.g., https://www.discogs.com/release/123)"
 
-    headers = {
-        'User-Agent': DISCOGS_USER_AGENT
-    }
+    # Get Discogs token from settings
+    headers = {'User-Agent': DISCOGS_USER_AGENT}
+    if st.session_state.get('discogs_token'):
+        headers['Authorization'] = f'Discogs token={st.session_state.discogs_token}'
     
     try:
         response = requests.get(
