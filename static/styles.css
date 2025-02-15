@@ -16,6 +16,11 @@
     color: var(--primary-color);
 }
 
+#spotify,
+#tidal {
+    padding-bottom: 0;
+}
+
 /* Input label styles */
 label:not([disabled]) {
     max-width: 100%;
