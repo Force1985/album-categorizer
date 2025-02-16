@@ -9,8 +9,9 @@ import os
 from ..utils.file_operations import save_image
 
 # Előre definiált kép típusok
-IMAGE_TYPES = [
-    'Front', 'Back', 'Vinyl A', 'Vinyl B', 'Vinyl C', 'Vinyl D', 'CD', 'Inside', 'Inlay', 'Cover', 'Label', 'Booklet', 'Other'
+IMAGE_TYPES = ['Select image type'] + [
+    'Front', 'Back', 'Vinyl A', 'Vinyl B', 'Vinyl C', 'Vinyl D', 'CD', 
+    'Inside', 'Inlay', 'Cover', 'Label', 'Booklet', 'Other'
 ]
 
 def init_image_state():
@@ -19,6 +20,24 @@ def init_image_state():
         st.session_state.discogs_images = []
     if 'image_types' not in st.session_state:
         st.session_state.image_types = {}
+
+def save_selected_images():
+    """Save all images that have a type selected"""
+    if not all([st.session_state.label, st.session_state.catalog, st.session_state.artist, st.session_state.title]):
+        st.warning('Please set the album folder name first')
+        return
+
+    folder_name = f"{st.session_state.label} {st.session_state.catalog} - {st.session_state.artist} - {st.session_state.title}"
+    saved_count = 0
+    
+    for idx, image in enumerate(st.session_state.discogs_images):
+        selected_type = st.session_state.get(f'image_type_{idx}')
+        if selected_type and selected_type != 'Select image type':
+            if save_image(image['uri'], folder_name, selected_type):
+                saved_count += 1
+    
+    if saved_count > 0:
+        st.toast(f"Successfully saved {saved_count} images", icon="✅")
 
 def render_image_gallery():
     """
@@ -34,7 +53,7 @@ def render_image_gallery():
             st.info('Load an album from Discogs to see its images')
             return
             
-        # Create 3 columns for the image grid
+        # Create 4 columns for the image grid
         cols = st.columns(4)
         
         # Distribute images across columns
@@ -81,8 +100,20 @@ def render_image_gallery():
                         # Get folder name from session state components
                         folder_name = f"{st.session_state.label} {st.session_state.catalog} - {st.session_state.artist} - {st.session_state.title}"
                         if all([st.session_state.label, st.session_state.catalog, st.session_state.artist, st.session_state.title]):
-                            save_image(image['uri'], folder_name, selected_type)
+                            if selected_type != 'Select image type':
+                                save_image(image['uri'], folder_name, selected_type)
                         else:
                             st.warning('Please set the album folder name first')
+        
+        # Add Save All button at the bottom
+        col1, sep, col2, col3 = st.columns([20, 1, 10, 10])
+        with col3:
+            if st.button(
+                'Save Selected Images',
+                use_container_width=True,
+                type="primary",
+                help="Save all images that have a type selected"
+            ):
+                save_selected_images()
         
         st.markdown("<div class='separator-line'> </div>", unsafe_allow_html=True)
