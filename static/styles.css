@@ -2,7 +2,7 @@
 
 :root {
     --primary-color: rgb(255, 75, 75);
-  }
+}
 
 /* Title styles */
 .custom-title {
@@ -118,6 +118,51 @@ label > div > p {
     color: rgb(255, 75, 75) !important;
 }
 
+/* Image styles */
+[data-testid="stFullScreenFrame"] > div {
+    width: 100%;
+}
+
+.stImage {
+    width: 100%;
+}
+
+div:not(:has(.stImage)) [data-testid="stImageContainer"] {
+    border-radius: 0.5rem;
+    border: 1px solid var(--primary-color);
+    background-color: black;
+    position: relative;
+    height: auto;
+    width: 100%;
+    overflow: hidden;
+}
+
+div:not(:has(.stImage)) [data-testid="stImageContainer"]::before {
+    content: "";
+    display: block;
+    padding-top: 50%;
+}
+
+[data-testid="stImageContainer"] img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: auto;
+    height: 100%;
+    transform: translateX(-50%) translateY(-50%);
+}
+
+[data-testid="stImageCaption"] {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px;
+    text-align: center;
+    font-size: 0.8em;
+}
 
 /* Separator styles */
 .separator {

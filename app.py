@@ -12,6 +12,7 @@ from src.transformations import (
 from src.components.url_input import render_url_input
 from src.components.folder_output import render_folder_output
 from src.components.info_panel import render_info_panel
+from src.components.image_gallery import render_image_gallery
 from src.components.file_manager import render_file_manager
 from src.components.streaming_services import render_streaming_services
 from src.components.settings_modal import init_settings, render_settings
@@ -120,6 +121,9 @@ if should_fetch:
             st.session_state.original_style = raw_styles
             st.session_state.original_notes = raw_notes
             st.session_state.original_discogs_url = discogs_url
+            
+            # Store images in session state
+            st.session_state.discogs_images = data.get('images', [])
 
             # Apply transformations and update current values
             st.session_state.label = transform_label(raw_label)
@@ -153,6 +157,9 @@ if st.session_state.api_response:
 
     # Render info panel
     render_info_panel()
+    
+    # Render image gallery
+    render_image_gallery()
 
     # Render file manager
     render_file_manager()
