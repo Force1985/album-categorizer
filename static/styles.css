@@ -18,7 +18,8 @@
 
 #spotify,
 #tidal,
-#beatport {
+#beatport,
+#apple-music {
     color: black;
     padding-bottom: 8px;
     padding-top: 8px;
@@ -37,6 +38,10 @@
 
 #beatport {
     background-color: #01ff95;
+}
+
+#apple-music {
+    background-color: #FA586B;
 }
 
 /* Input label styles */

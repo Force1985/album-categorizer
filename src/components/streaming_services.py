@@ -21,8 +21,9 @@ def create_search_urls(artist: str, album: str) -> tuple[str, str]:
     spotify_url = f'https://open.spotify.com/search/{encoded_term}/albums'
     tidal_url = f'https://listen.tidal.com/search/albums?q={encoded_term}'
     beatport_url = f'https://www.beatport.com/search?q={encoded_term}'
+    apple_music_url = f'https://music.apple.com/hu/search?term={encoded_term}'
     
-    return spotify_url, tidal_url, beatport_url
+    return spotify_url, tidal_url, beatport_url, apple_music_url
 
 def render_streaming_services():
     """
@@ -39,12 +40,12 @@ def render_streaming_services():
         
         if has_album:
             # Create search URLs
-            spotify_url, tidal_url, beatport_url = create_search_urls(
+            spotify_url, tidal_url, beatport_url, apple_music_url = create_search_urls(
                 st.session_state.original_artist,
                 st.session_state.original_title
             )
         
-        main_col1, main_sep1, main_col2, main_sep2, main_col3 = st.columns([13, 1, 13, 1, 13])
+        main_col1, main_sep1, main_col2, main_sep2, main_col3, main_sep3, main_col4 = st.columns([9.5, 1, 9.5, 1, 9.5, 1, 9.5])
         
         with main_col1:
             # Spotify section
@@ -58,12 +59,12 @@ def render_streaming_services():
 
             with col2:      
                 if not has_album:
-                    st.info('Tölts be egy albumot a Spotify kereső megjelenítéséhez')
+                    st.info('Enter an album to search on Spotify')
                 else:
                     st.markdown(
                         f'''
                         <a href="{spotify_url}" target="_blank" class="stButton-fake">
-                            Search on Spotify
+                            Search
                         </a>
                         ''',
                         unsafe_allow_html=True
@@ -84,12 +85,12 @@ def render_streaming_services():
 
             with col2:      
                 if not has_album:
-                    st.info('Tölts be egy albumot a TIDAL kereső megjelenítéséhez')
+                    st.info('Enter an album to search on TIDAL')
                 else:
                     st.markdown(
                         f'''
                         <a href="{tidal_url}" target="_blank" class="stButton-fake">
-                            Search on TIDAL
+                            Search
                         </a>
                         ''',
                         unsafe_allow_html=True
@@ -110,12 +111,38 @@ def render_streaming_services():
 
             with col2:      
                 if not has_album:
-                    st.info('Tölts be egy albumot a Beatport kereső megjelenítéséhez')
+                    st.info('Enter an album to search on Beatport')
                 else:
                     st.markdown(
                         f'''
                         <a href="{beatport_url}" target="_blank" class="stButton-fake">
-                            Search on Beatport
+                            Search
+                        </a>
+                        ''',
+                        unsafe_allow_html=True
+                    )
+
+        with main_sep3:
+            st.markdown("<div class='separator'> </div>", unsafe_allow_html=True)
+
+        with main_col4:
+            # Apple Music section
+            col1, sep, col2 = st.columns([6, 1, 6], vertical_alignment="center")
+
+            with col1:
+                st.markdown('###### Apple Music')
+
+            with sep:
+                st.markdown("<div class='separator-noPadding'>→</div>", unsafe_allow_html=True)
+
+            with col2:      
+                if not has_album:
+                    st.info('Enter an album to search on Apple Music')
+                else:
+                    st.markdown(
+                        f'''
+                        <a href="{apple_music_url}" target="_blank" class="stButton-fake">
+                            Search
                         </a>
                         ''',
                         unsafe_allow_html=True
