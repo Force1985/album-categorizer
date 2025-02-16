@@ -28,22 +28,6 @@
     text-align: center;
 }
 
-#spotify {
-    background-color: #1DB954;
-}
-
-#tidal {
-    background-color: #3FE;
-}
-
-#beatport {
-    background-color: #01ff95;
-}
-
-#apple-music {
-    background-color: #FA586B;
-}
-
 /* Input label styles */
 label:not([disabled]) {
     max-width: 100%;
@@ -116,6 +100,22 @@ label > div > p {
 .stButton-fake:hover {
     border-color: rgb(255, 75, 75);
     color: rgb(255, 75, 75) !important;
+}
+
+.stButton-fake.stButton-fake--spotify {
+    color: #1DB954 !important;
+}
+
+.stButton-fake.stButton-fake--tidal {
+    color: #3FE !important;
+}
+
+.stButton-fake.stButton-fake--beatport {
+    color: #01ff95 !important;
+}
+
+.stButton-fake.stButton-fake--apple-music {
+    color: #FA586B !important;
 }
 
 /* Image styles */
