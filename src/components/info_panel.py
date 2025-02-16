@@ -258,8 +258,8 @@ Format:    {st.session_state.info_format}
 Country:   {st.session_state.info_country}
 Released:  {st.session_state.info_released}
 Style:     {st.session_state.info_style}
-Discogs:   {transform_info_url(st.session_state.discogs_url)}
 {formatted_notes}
+Discogs:   {transform_info_url(st.session_state.discogs_url)}
 
 Tracklist:"""
 
