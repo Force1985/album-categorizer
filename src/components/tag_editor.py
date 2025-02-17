@@ -4,7 +4,9 @@ Tag editor component
 import streamlit as st
 from mutagen import File
 from mutagen.easyid3 import EasyID3
+from mutagen.mp3 import MP3
 from typing import Optional, Dict, List, Tuple
+import math
 
 # Define ordered list of common ID3 tags
 ORDERED_TAGS = [
@@ -20,6 +22,41 @@ ORDERED_TAGS = [
     'copyright',     # Copyright
 ]
 
+def format_duration(seconds: float) -> str:
+    """
+    Format duration in seconds to MM:SS format
+    """
+    if not seconds or math.isnan(seconds):
+        return ''
+    
+    minutes = int(seconds // 60)
+    remaining_seconds = int(seconds % 60)
+    return f"{minutes:02d}:{remaining_seconds:02d}"
+
+def get_audio_length(file) -> str:
+    """
+    Get audio file length in MM:SS format
+    
+    Args:
+        file: Audio file object
+        
+    Returns:
+        str: Audio length in MM:SS format
+    """
+    try:
+        # Try as MP3 first
+        audio = MP3(file)
+        return format_duration(audio.info.length)
+    except:
+        try:
+            # Try generic audio file
+            audio = File(file)
+            if audio is not None and hasattr(audio.info, 'length'):
+                return format_duration(audio.info.length)
+        except:
+            pass
+    return ''
+
 def get_all_id3_tags(file) -> Dict[str, str]:
     """
     Get all available ID3 tags from an audio file
@@ -30,67 +67,33 @@ def get_all_id3_tags(file) -> Dict[str, str]:
     Returns:
         Dict[str, str]: Dictionary of all available tags
     """
+    tags = {}
     try:
+        # Try to load as ID3
         audio = EasyID3(file)
         # Get all available tags
-        tags = {}
         for key in audio.valid_keys.keys():
             value = audio.get(key, [''])[0]
             if value:  # Only include non-empty tags
                 tags[key] = value
-        return tags
     except:
         try:
             # If not ID3, try generic tag support
             audio = File(file, easy=True)
-            if audio is not None:
-                return {key: str(value[0]) for key, value in audio.tags.items() if value}
+            if audio is not None and hasattr(audio, 'tags'):
+                tags = {key: str(value[0]) for key, value in audio.tags.items() if value}
         except:
             pass
-    return {}
-
-def edit_tags(file, metadata: Dict[str, str]) -> bool:
-    """
-    Edit ID3 tags of an audio file
     
-    Args:
-        file: Audio file object
-        metadata: Dictionary containing tag key-value pairs
-        
-    Returns:
-        bool: True if successful, False otherwise
-    """
+    # Try to get length separately
     try:
-        # Try to load as ID3
-        audio = EasyID3(file)
+        length = get_audio_length(file)
+        if length:
+            tags['length'] = length
     except:
-        try:
-            # If not ID3, try generic tag support
-            audio = File(file, easy=True)
-        except:
-            st.error(f'Could not load tags for file: {file}')
-            return False
-    
-    if audio is None:
-        st.error(f'File format not supported: {file}')
-        return False
+        pass
         
-    # Update tags
-    for key, value in metadata.items():
-        if value:  # Only set non-empty values
-            try:
-                audio[key] = value
-            except Exception as e:
-                st.error(f'Error setting {key}: {str(e)}')
-                return False
-    
-    # Save changes
-    try:
-        audio.save()
-        return True
-    except Exception as e:
-        st.error(f'Error saving tags: {str(e)}')
-        return False
+    return tags
 
 def get_tag_display_name(tag_key: str) -> str:
     """
@@ -143,6 +146,49 @@ def get_ordered_tag_list() -> List[str]:
     
     return ordered_tags + remaining_tags
 
+def edit_tags(file, metadata: Dict[str, str]) -> bool:
+    """
+    Edit ID3 tags of an audio file
+    
+    Args:
+        file: Audio file object
+        metadata: Dictionary containing tag key-value pairs
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        # Try to load as ID3
+        audio = EasyID3(file)
+    except:
+        try:
+            # If not ID3, try generic tag support
+            audio = File(file, easy=True)
+        except:
+            st.error(f'Could not load tags for file: {file}')
+            return False
+    
+    if audio is None:
+        st.error(f'File format not supported: {file}')
+        return False
+        
+    # Update tags
+    for key, value in metadata.items():
+        if value:  # Only set non-empty values
+            try:
+                audio[key] = value
+            except Exception as e:
+                st.error(f'Error setting {key}: {str(e)}')
+                return False
+    
+    # Save changes
+    try:
+        audio.save()
+        return True
+    except Exception as e:
+        st.error(f'Error saving tags: {str(e)}')
+        return False
+
 def render_tag_editor(uploaded_file, track_info: Optional[Dict] = None) -> Optional[Dict[str, str]]:
     """
     Render tag editor interface for an audio file
@@ -159,13 +205,12 @@ def render_tag_editor(uploaded_file, track_info: Optional[Dict] = None) -> Optio
     
     tags_col1, tags_sep, tags_col2 = st.columns([20, 1, 20])
 
-    with tags_col1:
-        # Get current tags
-        current_tags = get_all_id3_tags(uploaded_file)
+    # Get current tags from file
+    current_tags = get_all_id3_tags(uploaded_file)
 
-        # Create two columns for current and suggested tags
+    with tags_col1:
         st.markdown("##### Current Tags")
-        # Use ordered tag list
+        # Show current tags (read-only)
         for tag_key in get_ordered_tag_list():
             current_value = current_tags.get(tag_key, '')
             st.text_input(
@@ -182,8 +227,7 @@ def render_tag_editor(uploaded_file, track_info: Optional[Dict] = None) -> Optio
         # Create suggested tags from track_info if available
         suggested_tags = {}
         if track_info:
-            # Map track_info fields to ID3 tags - this mapping should be customized
-            # based on your track_info structure
+            # Map track_info fields to ID3 tags
             suggested_tags = {
                 'title': track_info.get('title', ''),
                 'artist': track_info.get('artist', ''),
@@ -192,21 +236,33 @@ def render_tag_editor(uploaded_file, track_info: Optional[Dict] = None) -> Optio
                 'date': str(track_info.get('year', '')),
                 'genre': track_info.get('genre', ''),
                 'organization': track_info.get('label', ''),
-                # Add more mappings as needed
             }
+        
+        # Add file length to suggested tags
+        length = get_audio_length(uploaded_file)
+        if length:
+            suggested_tags['length'] = length
             
-        # Show editable fields with suggestions
         st.markdown("##### Suggested Tags")
         edited_tags = {}
-        # Use ordered tag list
+        
+        # Show editable fields with suggestions
         for tag_key in get_ordered_tag_list():
+            # Get suggested value, if none available use current value
             suggested_value = suggested_tags.get(tag_key, '')
+            
+            # Length field should be disabled as it's a file property
+            is_disabled = tag_key == 'length'
+            
             edited_value = st.text_input(
                 get_tag_display_name(tag_key),
                 value=suggested_value,
+                disabled=is_disabled,
                 key=f'edited_{tag_key}_{id(uploaded_file)}'
             )
-            if edited_value and edited_value != current_tags.get(tag_key, ''):
+            
+            # Only add to edited_tags if the value is different from current
+            if not is_disabled and edited_value and edited_value != current_tags.get(tag_key, ''):
                 edited_tags[tag_key] = edited_value
         
         # Save button
