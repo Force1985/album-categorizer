@@ -39,6 +39,10 @@ def get_track_info(track_id: str) -> dict:
     # Generate copyright text
     copyright_text = f'℗ {year} {label}' if year and label else ''
     
+    # Generate comment text
+    notes = st.session_state.get('info_notes', '')
+    comment = f'{notes}' if notes else ''
+    
     return {
         'position': st.session_state.get(f'track_position_{track_id}', ''),
         'artist': st.session_state.get(f'track_artist_{track_id}', ''),
@@ -48,7 +52,8 @@ def get_track_info(track_id: str) -> dict:
         'genre': st.session_state.get('info_style', ''),
         'label': label,
         'copyright': copyright_text,
-        'albumartist': album_artist
+        'albumartist': album_artist,
+        'comment': comment
     }
 
 def render_file_manager():

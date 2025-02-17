@@ -20,6 +20,16 @@ def init_image_state():
         st.session_state.discogs_images = []
     if 'image_types' not in st.session_state:
         st.session_state.image_types = {}
+    if 'selected_artwork_index' not in st.session_state:
+        st.session_state.selected_artwork_index = 0
+
+def get_artwork_data(image_url: str) -> bytes:
+    """Get artwork data from URL"""
+    headers = {
+        'User-Agent': 'AlbumCategorizer/1.0'
+    }
+    response = requests.get(image_url, headers=headers)
+    return response.content
 
 def save_selected_images():
     """Save all images that have a type selected"""
@@ -39,6 +49,10 @@ def save_selected_images():
     if saved_count > 0:
         st.toast(f"Successfully saved {saved_count} images", icon="✅")
 
+def on_artwork_select():
+    """Handle artwork selection change"""
+    st.session_state.selected_artwork_index = int(st.session_state.artwork_selection)
+
 def render_image_gallery():
     """
     Renders the image gallery component that displays Discogs images.
@@ -52,6 +66,17 @@ def render_image_gallery():
         if not st.session_state.discogs_images:
             st.info('Load an album from Discogs to see its images')
             return
+            
+        # Create radio options for artwork selection
+        artwork_options = {str(i): f"Image {i+1}" for i in range(len(st.session_state.discogs_images))}
+        selected = st.radio(
+            "Select artwork for ID3 tag",
+            options=artwork_options.keys(),
+            format_func=lambda x: artwork_options[x],
+            key="artwork_selection",
+            on_change=on_artwork_select,
+            horizontal=True
+        )
             
         # Create 4 columns for the image grid
         cols = st.columns(4)
@@ -99,11 +124,8 @@ def render_image_gallery():
                         key=f'save_btn_{idx}'):
                         # Get folder name from session state components
                         folder_name = f"{st.session_state.label} {st.session_state.catalog} - {st.session_state.artist} - {st.session_state.title}"
-                        if all([st.session_state.label, st.session_state.catalog, st.session_state.artist, st.session_state.title]):
-                            if selected_type != 'Select image type':
-                                save_image(image['uri'], folder_name, selected_type)
-                        else:
-                            st.warning('Please set the album folder name first')
+                        if save_image(image['uri'], folder_name, selected_type):
+                            st.toast(f"Successfully saved image as {selected_type}", icon="✅")
         
         # Add Save All button at the bottom
         col1, sep, col2, col3 = st.columns([20, 1, 10, 10])
