@@ -6,6 +6,20 @@ from mutagen import File
 from mutagen.easyid3 import EasyID3
 from typing import Optional, Dict, List, Tuple
 
+# Define ordered list of common ID3 tags
+ORDERED_TAGS = [
+    'tracknumber',    # Track Number
+    'artist',         # Artist
+    'title',         # Title
+    'length',        # Length
+    'genre',         # Genre
+    'albumartist',   # Album Artist
+    'album',         # Album
+    'date',          # Year
+    'organization',  # Label
+    'copyright',     # Copyright
+]
+
 def get_all_id3_tags(file) -> Dict[str, str]:
     """
     Get all available ID3 tags from an audio file
@@ -92,6 +106,7 @@ def get_tag_display_name(tag_key: str) -> str:
         'date': 'Year',
         'originaldate': 'Original Year',
         'genre': 'Genre',
+        'length': 'Length',
         'composer': 'Composer',
         'conductor': 'Conductor',
         'remixer': 'Remixer',
@@ -111,6 +126,22 @@ def get_tag_display_name(tag_key: str) -> str:
         'website': 'Website'
     }
     return display_names.get(tag_key, tag_key.title())
+
+def get_ordered_tag_list() -> List[str]:
+    """
+    Get ordered list of ID3 tags, starting with common tags in specific order,
+    followed by remaining tags alphabetically
+    """
+    # Get all valid tags
+    all_tags = set(EasyID3.valid_keys.keys())
+    
+    # Start with ordered common tags that exist in valid tags
+    ordered_tags = [tag for tag in ORDERED_TAGS if tag in all_tags]
+    
+    # Add remaining tags in alphabetical order
+    remaining_tags = sorted(list(all_tags - set(ordered_tags)))
+    
+    return ordered_tags + remaining_tags
 
 def render_tag_editor(uploaded_file, track_info: Optional[Dict] = None) -> Optional[Dict[str, str]]:
     """
@@ -134,7 +165,8 @@ def render_tag_editor(uploaded_file, track_info: Optional[Dict] = None) -> Optio
 
         # Create two columns for current and suggested tags
         st.markdown("##### Current Tags")
-        for tag_key in EasyID3.valid_keys.keys():
+        # Use ordered tag list
+        for tag_key in get_ordered_tag_list():
             current_value = current_tags.get(tag_key, '')
             st.text_input(
                 get_tag_display_name(tag_key),
@@ -166,7 +198,8 @@ def render_tag_editor(uploaded_file, track_info: Optional[Dict] = None) -> Optio
         # Show editable fields with suggestions
         st.markdown("##### Suggested Tags")
         edited_tags = {}
-        for tag_key in EasyID3.valid_keys.keys():
+        # Use ordered tag list
+        for tag_key in get_ordered_tag_list():
             suggested_value = suggested_tags.get(tag_key, '')
             edited_value = st.text_input(
                 get_tag_display_name(tag_key),
