@@ -26,14 +26,29 @@ def get_track_display(track_id: str) -> str:
 
 def get_track_info(track_id: str) -> dict:
     """Get track information from session state"""
+    # Get release date and extract year if available
+    release_date = st.session_state.get('info_released', '')
+    year = release_date[:4] if release_date and len(release_date) >= 4 else ''
+    
+    # Get label
+    label = st.session_state.get('info_label', '')
+    
+    # Get album artist from info panel
+    album_artist = st.session_state.get('info_artist', '')
+    
+    # Generate copyright text
+    copyright_text = f'℗ {year} {label}' if year and label else ''
+    
     return {
         'position': st.session_state.get(f'track_position_{track_id}', ''),
         'artist': st.session_state.get(f'track_artist_{track_id}', ''),
         'title': st.session_state.get(f'track_title_{track_id}', ''),
-        'album': st.session_state.get('album_title', ''),
-        'year': st.session_state.get('album_year', ''),
-        'genre': st.session_state.get('album_genre', ''),
-        'label': st.session_state.get('album_label', '')
+        'album': st.session_state.get('info_title', ''),
+        'year': year,
+        'genre': st.session_state.get('info_style', ''),
+        'label': label,
+        'copyright': copyright_text,
+        'albumartist': album_artist
     }
 
 def render_file_manager():

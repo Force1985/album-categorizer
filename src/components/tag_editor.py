@@ -231,11 +231,13 @@ def render_tag_editor(uploaded_file, track_info: Optional[Dict] = None) -> Optio
             suggested_tags = {
                 'title': track_info.get('title', ''),
                 'artist': track_info.get('artist', ''),
+                'albumartist': track_info.get('albumartist', ''),
                 'album': track_info.get('album', ''),
                 'tracknumber': str(track_info.get('position', '')),
                 'date': str(track_info.get('year', '')),
                 'genre': track_info.get('genre', ''),
                 'organization': track_info.get('label', ''),
+                'copyright': track_info.get('copyright', '')
             }
         
         # Add file length to suggested tags
