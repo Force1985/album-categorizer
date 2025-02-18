@@ -22,6 +22,8 @@ def init_image_state():
         st.session_state.image_types = {}
     if 'selected_artwork_index' not in st.session_state:
         st.session_state.selected_artwork_index = 0
+    if 'selected_artwork' not in st.session_state:
+        st.session_state.selected_artwork = None
 
 def get_artwork_data(image_url: str) -> bytes:
     """Get artwork data from URL"""
@@ -51,7 +53,12 @@ def save_selected_images():
 
 def on_artwork_select():
     """Handle artwork selection change"""
-    st.session_state.selected_artwork_index = int(st.session_state.artwork_selection)
+    idx = int(st.session_state.artwork_selection)
+    st.session_state.selected_artwork_index = idx
+    # Store the selected artwork URL in session state
+    if st.session_state.discogs_images and len(st.session_state.discogs_images) > idx:
+        st.session_state.selected_artwork = st.session_state.discogs_images[idx]['uri']
+        st.write("Debug - Selected artwork URL:", st.session_state.selected_artwork)
 
 def render_image_gallery():
     """

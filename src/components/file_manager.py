@@ -10,6 +10,7 @@ from ..utils.file_operations import create_album_folder
 from .tag_editor import render_tag_editor, edit_tags
 from mutagen.id3 import ID3, APIC, COMM
 from mutagen.easyid3 import EasyID3
+import requests
 
 def init_track_file_pairs():
     """Initialize track-file pairs in session state"""
@@ -87,7 +88,29 @@ def get_track_metadata(track_id: str) -> Dict[str, str]:
     Returns:
         Dict[str, str]: Track metadata
     """
-    return {
+    # Get artwork data
+    artwork_data = None
+    if 'selected_artwork' in st.session_state:
+        artwork_url = st.session_state.selected_artwork
+        try:
+            # Download artwork data with proper headers
+            headers = {
+                'User-Agent': 'AlbumCategorizer/1.0',
+                'Referer': 'https://www.discogs.com/'
+            }
+            response = requests.get(artwork_url, headers=headers)
+            if response.status_code == 200:
+                artwork_data = response.content
+                st.write("Debug - Downloaded artwork data length:", len(artwork_data))
+            else:
+                st.error(f"Error downloading artwork: {response.status_code} - {response.text}")
+        except Exception as e:
+            st.error(f"Error downloading artwork: {str(e)}")
+    
+    # Get notes
+    notes = st.session_state.get('info_notes', '')
+    
+    metadata = {
         'tracknumber': st.session_state.get(f'track_position_{track_id}', ''),
         'title': st.session_state.get(f'track_title_{track_id}', ''),
         'artist': st.session_state.get(f'track_artist_{track_id}', ''),
@@ -97,9 +120,16 @@ def get_track_metadata(track_id: str) -> Dict[str, str]:
         'genre': st.session_state.get('info_style', ''),
         'organization': st.session_state.get('info_label', ''),
         'copyright': f"{st.session_state.get('info_released', '')[:4]} {st.session_state.get('info_label', '')}" if st.session_state.get('info_released', '') and st.session_state.get('info_label', '') else '',
-        'comment': f"{st.session_state.get('info_notes', '')}" if st.session_state.get('info_notes', '') else '',
-        'artwork': st.session_state.get('selected_artwork_data', None)
+        'comment': notes,
+        'artwork': artwork_data
     }
+    
+    # Debug log
+    st.write("Debug - Metadata:", {k: str(v)[:100] + '...' if isinstance(v, bytes) else v for k, v in metadata.items()})
+    st.write("Debug - Session state keys:", list(st.session_state.keys()))
+    st.write("Debug - Selected artwork URL:", st.session_state.get('selected_artwork', 'Not found'))
+    
+    return metadata
 
 def create_album_folder(folder_name: str) -> bool:
     """Create album folder"""
@@ -172,27 +202,37 @@ def save_files(uploaded_files: Dict[str, Dict], edited_tags: Dict[str, Dict]) ->
                 tmp_file.write(uploaded_file.getvalue())
                 tmp_file.close()  # Close the file but don't delete it yet
                 
-                # Create EasyID3 object for the temporary file
-                audio = EasyID3(tmp_file.name)
+                try:
+                    # First try to delete all existing ID3 tags
+                    id3 = ID3(tmp_file.name)
+                    id3.delete()
+                    id3.save()
+                except:
+                    # If the file doesn't have ID3 tags yet, create them
+                    try:
+                        id3 = ID3()
+                        id3.save(tmp_file.name)
+                    except Exception as e:
+                        st.error(f'Error initializing ID3 tags: {str(e)}')
+                        return False
                 
-                # Update standard tags
+                try:
+                    # Initialize EasyID3
+                    audio = EasyID3(tmp_file.name)
+                except:
+                    # If EasyID3 tags don't exist, add them
+                    try:
+                        EasyID3.create(tmp_file.name)
+                        audio = EasyID3(tmp_file.name)
+                    except Exception as e:
+                        st.error(f'Error initializing EasyID3 tags: {str(e)}')
+                        return False
+                
+                # Update standard tags first
                 for key, value in metadata.items():
-                    if key not in ['artwork', 'length'] and value:  # Skip artwork and length
+                    if key not in ['artwork', 'length', 'comment'] and value:  # Skip artwork, length and comment
                         try:
-                            if key == 'comment':
-                                # Update comment
-                                id3 = ID3(tmp_file.name)
-                                id3.delall('COMM')  # Remove existing comments
-                                id3.add(COMM(
-                                    encoding=3,
-                                    lang='eng',
-                                    desc='description',
-                                    text=value
-                                ))
-                                id3.save()
-                            else:
-                                # Update other tags
-                                audio[key] = value
+                            audio[key] = value
                         except Exception as e:
                             st.error(f'Error setting {key}: {str(e)}')
                             return False
@@ -200,20 +240,46 @@ def save_files(uploaded_files: Dict[str, Dict], edited_tags: Dict[str, Dict]) ->
                 # Save standard tags
                 audio.save()
                 
-                # Handle artwork separately
-                if 'artwork' in metadata and metadata['artwork']:
-                    id3 = ID3(tmp_file.name)
-                    # Remove existing artwork
-                    id3.delall('APIC')
-                    # Add new artwork
-                    id3.add(APIC(
-                        encoding=3,  # UTF-8
-                        mime='image/jpeg',  # Image MIME type
-                        type=3,  # Cover (front)
-                        desc='Cover',
-                        data=metadata['artwork']
+                # Now handle comment and artwork with full ID3
+                id3 = ID3(tmp_file.name)
+                
+                # Add comment if present
+                if metadata.get('comment'):
+                    # Remove existing comments
+                    id3.delall('COMM')
+                    # Add new comment
+                    id3.add(COMM(
+                        encoding=3,
+                        lang='eng',
+                        desc='description',
+                        text=metadata['comment']
                     ))
-                    id3.save()
+                    st.write("Debug - Added comment:", metadata['comment'])
+                
+                # Add artwork if present
+                if metadata.get('artwork'):
+                    st.write("Debug - Adding artwork...")
+                    try:
+                        # Remove existing artwork
+                        id3.delall('APIC')
+                        # Add new artwork
+                        id3.add(APIC(
+                            encoding=3,  # UTF-8
+                            mime='image/jpeg',  # Image MIME type
+                            type=3,  # Cover (front)
+                            desc='Cover',
+                            data=metadata['artwork']
+                        ))
+                        st.write("Debug - Successfully added artwork")
+                    except Exception as e:
+                        st.error(f"Error adding artwork: {str(e)}")
+                
+                # Save ID3 tags
+                try:
+                    id3.save(v2_version=3)
+                    st.write("Debug - Saved ID3 tags")
+                except Exception as e:
+                    st.error(f"Error saving ID3 tags: {str(e)}")
                 
                 # Copy the file with updated tags to the export directory
                 shutil.copy2(tmp_file.name, export_path)
