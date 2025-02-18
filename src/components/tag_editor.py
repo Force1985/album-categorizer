@@ -315,7 +315,7 @@ def render_tag_editor(uploaded_file, track_info: Optional[Dict] = None) -> Optio
         track_info: Optional dictionary containing suggested track information
         
     Returns:
-        Optional[Dict[str, str]]: Dictionary of edited tags if save was clicked
+        Optional[Dict[str, str]]: Dictionary of edited tags if there are changes
     """
     if not uploaded_file:
         return None
@@ -426,10 +426,8 @@ def render_tag_editor(uploaded_file, track_info: Optional[Dict] = None) -> Optio
         if 'artwork' in suggested_tags:
             edited_tags['artwork'] = suggested_tags['artwork']
         
-        # Save button
-        if edited_tags and st.button('Apply Suggested Tags', key=f'save_tags_{id(uploaded_file)}'):
-            if edit_tags(uploaded_file, edited_tags):
-                st.success('Tags updated successfully!')
-                return edited_tags
+        # Return edited tags if there are any changes
+        if edited_tags:
+            return edited_tags
     
     return None
