@@ -11,6 +11,7 @@ from .tag_editor import render_tag_editor, edit_tags
 from mutagen.id3 import ID3, APIC, COMM
 from mutagen.easyid3 import EasyID3
 import requests
+import re
 
 def init_track_file_pairs():
     """Initialize track-file pairs in session state"""
@@ -46,8 +47,18 @@ def get_track_display(track_id: str) -> str:
         return f"{position}. {artist} - {title}"
     return f"{position}. {title}"
 
-def get_track_info(track_id: str) -> dict:
-    """Get track information from session state"""
+def get_track_info(track_id: str) -> Dict[str, str]:
+    """
+    Get track information from session state
+    
+    Args:
+        track_id: Track ID
+        
+    Returns:
+        Dict containing track information including artist, album, title,
+        position (original string), tracknumber (numeric part) and 
+        discnumber (A/B/C/D converted to 1/2/3/4)
+    """
     # Get release date and extract year if available
     release_date = st.session_state.get('info_released', '')
     year = release_date[:4] if release_date and len(release_date) >= 4 else ''
@@ -59,14 +70,40 @@ def get_track_info(track_id: str) -> dict:
     album_artist = st.session_state.get('info_artist', '')
     
     # Generate copyright text
-    copyright_text = f' {year} {label}' if year and label else ''
+    copyright_text = f'{year} {label}' if year and label else ''
     
     # Generate comment text
     notes = st.session_state.get('info_notes', '')
     comment = f'{notes}' if notes else ''
     
+    # Get position and split into disc (A/B) and track number
+    position = st.session_state.get(f'track_position_{track_id}', '')
+    disc_number = '1'  # Default to disc 1
+    track_number = ''
+    
+    if position:
+        # Extract A/B and number from position (e.g., "A1", "B2")
+        if position.upper().startswith('A'):
+            disc_number = '1'
+            track_number = position[1:]
+        elif position.upper().startswith('B'):
+            disc_number = '2'
+            track_number = position[1:]
+        elif position.upper().startswith('C'):
+            disc_number = '3'
+            track_number = position[1:]
+        elif position.upper().startswith('D'):
+            disc_number = '4'
+            track_number = position[1:]
+        else:
+            # If no letter prefix, just use the number
+            track_number = position
+    
+    # Extract only numbers from track_number
+    track_number = ''.join(re.findall(r'\d+', track_number)) if track_number else ''
+    
     return {
-        'position': st.session_state.get(f'track_position_{track_id}', ''),
+        'position': position,  # Keep original position for display
         'artist': st.session_state.get(f'track_artist_{track_id}', ''),
         'title': st.session_state.get(f'track_title_{track_id}', ''),
         'album': st.session_state.get('info_title', ''),
@@ -75,7 +112,9 @@ def get_track_info(track_id: str) -> dict:
         'label': label,
         'copyright': copyright_text,
         'albumartist': album_artist,
-        'comment': comment
+        'comment': comment,
+        'tracknumber': track_number,
+        'discnumber': disc_number
     }
 
 def get_track_metadata(track_id: str) -> Dict[str, str]:
@@ -107,20 +146,21 @@ def get_track_metadata(track_id: str) -> Dict[str, str]:
         except Exception as e:
             st.error(f"Error downloading artwork: {str(e)}")
     
-    # Get notes
-    notes = st.session_state.get('info_notes', '')
+    # Get track info
+    track_info = get_track_info(track_id)
     
     metadata = {
-        'tracknumber': st.session_state.get(f'track_position_{track_id}', ''),
-        'title': st.session_state.get(f'track_title_{track_id}', ''),
-        'artist': st.session_state.get(f'track_artist_{track_id}', ''),
-        'album': st.session_state.get('info_title', ''),
-        'albumartist': st.session_state.get('info_artist', ''),
-        'date': st.session_state.get('info_released', '')[:4] if st.session_state.get('info_released', '') else '',
-        'genre': st.session_state.get('info_style', ''),
-        'organization': st.session_state.get('info_label', ''),
-        'copyright': f"{st.session_state.get('info_released', '')[:4]} {st.session_state.get('info_label', '')}" if st.session_state.get('info_released', '') and st.session_state.get('info_label', '') else '',
-        'comment': notes,
+        'discnumber': track_info['discnumber'],
+        'tracknumber': track_info['tracknumber'],
+        'title': track_info['title'],
+        'artist': track_info['artist'],
+        'album': track_info['album'],
+        'albumartist': track_info['albumartist'],
+        'date': track_info['year'],
+        'genre': track_info['genre'],
+        'organization': track_info['label'],
+        'copyright': track_info['copyright'],
+        'comment': track_info['comment'],
         'artwork': artwork_data
     }
     
