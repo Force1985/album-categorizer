@@ -113,7 +113,7 @@ def get_artwork_data_from_file(uploaded_file) -> Optional[bytes]:
 
 def get_all_id3_tags(uploaded_file) -> Dict[str, str]:
     """
-    Get all available ID3 tags from an audio file
+    Get all available tags from an audio file
     
     Args:
         uploaded_file: Streamlit UploadedFile object
@@ -130,52 +130,93 @@ def get_all_id3_tags(uploaded_file) -> Dict[str, str]:
         tmp_file.flush()
         
         try:
-            # Try to load as ID3 for standard tags
-            audio = EasyID3(tmp_file.name)
-            # Get all available tags
-            for key in audio.valid_keys.keys():
-                value = audio.get(key, [''])[0]
-                if value:  # Only include non-empty tags
-                    tags[key] = value
+            # Check if file is FLAC
+            if uploaded_file.name.lower().endswith('.flac'):
+                from mutagen.flac import FLAC
+                audio = FLAC(tmp_file.name)
+                
+                # Map FLAC tags to our standard format
+                tag_mapping = {
+                    'TITLE': 'title',
+                    'ARTIST': 'artist',
+                    'ALBUM': 'album',
+                    'ALBUMARTIST': 'albumartist',
+                    'DATE': 'date',
+                    'GENRE': 'genre',
+                    'TRACKNUMBER': 'tracknumber',
+                    'DISCNUMBER': 'discnumber',
+                    'ORGANIZATION': 'organization',
+                    'COPYRIGHT': 'copyright',
+                    'DESCRIPTION': 'comment'
+                }
+                
+                # Convert FLAC tags to our standard format
+                for flac_key, value in audio.tags.items():
+                    standard_key = tag_mapping.get(flac_key.upper(), flac_key.lower())
+                    if value:  # Only include non-empty tags
+                        tags[standard_key] = value[0]
+                
+                # Handle artwork separately
+                if audio.pictures:
+                    for pic in audio.pictures:
+                        if pic.type == 3:  # Front cover
+                            tags['artwork'] = pic.data
+                            break
+                
+                # Get length
+                if audio.info.length:
+                    tags['length'] = format_duration(audio.info.length)
                     
-            # Load full ID3 tags for artwork and comments
-            id3 = ID3(tmp_file.name)
-            
-            # Try to get artwork
-            artwork_data = get_artwork_data_from_file(uploaded_file)
-            if artwork_data:
-                tags['artwork'] = artwork_data
+            else:
+                # Existing ID3 tag handling code
+                try:
+                    # Try to load as ID3 for standard tags
+                    audio = EasyID3(tmp_file.name)
+                    # Get all available tags
+                    for key in audio.valid_keys.keys():
+                        value = audio.get(key, [''])[0]
+                        if value:  # Only include non-empty tags
+                            tags[key] = value
+                            
+                    # Load full ID3 tags for artwork and comments
+                    id3 = ID3(tmp_file.name)
+                    
+                    # Try to get artwork
+                    artwork_data = get_artwork_data_from_file(uploaded_file)
+                    if artwork_data:
+                        tags['artwork'] = artwork_data
+                        
+                    # Try to get comments
+                    for tag in id3.getall('COMM'):
+                        if tag.lang == 'eng':  # Get English comments
+                            tags['comment'] = tag.text[0]
+                            break
+                            
+                except Exception as e:
+                    st.error(f"Error reading tags: {str(e)}")
+                    try:
+                        # If not ID3, try generic tag support
+                        audio = File(tmp_file.name, easy=True)
+                        if audio is not None and hasattr(audio, 'tags'):
+                            tags = {key: str(value[0]) for key, value in audio.tags.items() if value}
+                    except:
+                        pass
                 
-            # Try to get comments
-            for tag in id3.getall('COMM'):
-                if tag.lang == 'eng':  # Get English comments
-                    tags['comment'] = tag.text[0]
-                    break
-                
-        except Exception as e:
-            st.error(f"Error reading tags: {str(e)}")
+                # Try to get length separately
+                try:
+                    length = get_audio_length(uploaded_file)
+                    if length:
+                        tags['length'] = length
+                except:
+                    pass
+                    
+        finally:
+            # Clean up the temporary file
             try:
-                # If not ID3, try generic tag support
-                audio = File(tmp_file.name, easy=True)
-                if audio is not None and hasattr(audio, 'tags'):
-                    tags = {key: str(value[0]) for key, value in audio.tags.items() if value}
+                os.unlink(tmp_file.name)
             except:
                 pass
-        
-        # Try to get length separately
-        try:
-            length = get_audio_length(uploaded_file)
-            if length:
-                tags['length'] = length
-        except:
-            pass
-        
-        # Clean up the temporary file
-        try:
-            os.unlink(tmp_file.name)
-        except:
-            pass
-            
+                
     return tags
 
 def edit_tags(uploaded_file, edited_tags: Dict[str, str]) -> Tuple[bool, str]:

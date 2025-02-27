@@ -242,84 +242,124 @@ def save_files(uploaded_files: Dict[str, Dict], edited_tags: Dict[str, Dict]) ->
                 tmp_file.write(uploaded_file.getvalue())
                 tmp_file.close()  # Close the file but don't delete it yet
                 
-                try:
-                    # First try to delete all existing ID3 tags
-                    id3 = ID3(tmp_file.name)
-                    id3.delete()
-                    id3.save()
-                except:
-                    # If the file doesn't have ID3 tags yet, create them
+                if ext == '.flac':
+                    from mutagen.flac import FLAC, Picture
+                    # Load FLAC file
+                    audio = FLAC(tmp_file.name)
+                    
+                    # Clear existing tags and pictures
+                    audio.clear_pictures()
+                    audio.tags.clear()
+                    
+                    # Add new tags
+                    for key, value in metadata.items():
+                        if key == 'artwork' and isinstance(value, bytes):
+                            picture = Picture()
+                            picture.type = 3  # Front cover
+                            picture.mime = 'image/jpeg'
+                            picture.desc = 'Front cover'
+                            picture.data = value
+                            audio.add_picture(picture)
+                        elif key not in ['artwork', 'length']:
+                            # Convert keys to FLAC standard
+                            flac_key = {
+                                'tracknumber': 'TRACKNUMBER',
+                                'discnumber': 'DISCNUMBER',
+                                'albumartist': 'ALBUMARTIST',
+                                'genre': 'GENRE',
+                                'artist': 'ARTIST',
+                                'title': 'TITLE',
+                                'album': 'ALBUM',
+                                'date': 'DATE',
+                                'organization': 'ORGANIZATION',
+                                'copyright': 'COPYRIGHT',
+                                'comment': 'DESCRIPTION'
+                            }.get(key.lower(), key.upper())
+                            
+                            if value:  # Only add non-empty values
+                                audio.tags[flac_key] = str(value)
+                    
+                    # Save changes
+                    audio.save()
+                else:
                     try:
-                        id3 = ID3()
-                        id3.save(tmp_file.name)
-                    except Exception as e:
-                        st.error(f'Error initializing ID3 tags: {str(e)}')
-                        return False
-                
-                try:
-                    # Initialize EasyID3
-                    audio = EasyID3(tmp_file.name)
-                except:
-                    # If EasyID3 tags don't exist, add them
-                    try:
-                        EasyID3.create(tmp_file.name)
-                        audio = EasyID3(tmp_file.name)
-                    except Exception as e:
-                        st.error(f'Error initializing EasyID3 tags: {str(e)}')
-                        return False
-                
-                # Update standard tags first
-                for key, value in metadata.items():
-                    if key not in ['artwork', 'length', 'comment'] and value:  # Skip artwork, length and comment
+                        # First try to delete all existing ID3 tags
+                        id3 = ID3(tmp_file.name)
+                        id3.delete()
+                        id3.save()
+                    except:
+                        # If the file doesn't have ID3 tags yet, create them
                         try:
-                            audio[key] = value
+                            id3 = ID3()
+                            id3.save(tmp_file.name)
                         except Exception as e:
-                            st.error(f'Error setting {key}: {str(e)}')
+                            st.error(f'Error initializing ID3 tags: {str(e)}')
                             return False
-                
-                # Save standard tags
-                audio.save()
-                
-                # Now handle comment and artwork with full ID3
-                id3 = ID3(tmp_file.name)
-                
-                # Add comment if present
-                if metadata.get('comment'):
-                    # Remove existing comments
-                    id3.delall('COMM')
-                    # Add new comment
-                    id3.add(COMM(
-                        encoding=3,
-                        lang='eng',
-                        desc='description',
-                        text=metadata['comment']
-                    ))
-                    st.write("Debug - Added comment:", metadata['comment'])
-                
-                # Add artwork if present
-                if metadata.get('artwork'):
-                    st.write("Debug - Adding artwork...")
+                    
                     try:
-                        # Remove existing artwork
-                        id3.delall('APIC')
-                        # Add new artwork
-                        id3.add(APIC(
-                            encoding=3,  # UTF-8
-                            mime='image/jpeg',  # Image MIME type
-                            type=3,  # Cover (front)
-                            desc='Cover',
-                            data=metadata['artwork']
+                        # Initialize EasyID3
+                        audio = EasyID3(tmp_file.name)
+                    except:
+                        # If EasyID3 tags don't exist, add them
+                        try:
+                            EasyID3.create(tmp_file.name)
+                            audio = EasyID3(tmp_file.name)
+                        except Exception as e:
+                            st.error(f'Error initializing EasyID3 tags: {str(e)}')
+                            return False
+                    
+                    # Update standard tags first
+                    for key, value in metadata.items():
+                        if key not in ['artwork', 'length', 'comment'] and value:  # Skip artwork, length and comment
+                            try:
+                                audio[key] = value
+                            except Exception as e:
+                                st.error(f'Error setting {key}: {str(e)}')
+                                return False
+                    
+                    # Save standard tags
+                    audio.save()
+                    
+                    # Now handle comment and artwork with full ID3
+                    id3 = ID3(tmp_file.name)
+                    
+                    # Add comment if present
+                    if metadata.get('comment'):
+                        # Remove existing comments
+                        id3.delall('COMM')
+                        # Add new comment
+                        id3.add(COMM(
+                            encoding=3,
+                            lang='eng',
+                            desc='description',
+                            text=metadata['comment']
                         ))
-                        st.write("Debug - Successfully added artwork")
+                        st.write("Debug - Added comment:", metadata['comment'])
+                    
+                    # Add artwork if present
+                    if metadata.get('artwork'):
+                        st.write("Debug - Adding artwork...")
+                        try:
+                            # Remove existing artwork
+                            id3.delall('APIC')
+                            # Add new artwork
+                            id3.add(APIC(
+                                encoding=3,  # UTF-8
+                                mime='image/jpeg',  # Image MIME type
+                                type=3,  # Cover (front)
+                                desc='Cover',
+                                data=metadata['artwork']
+                            ))
+                            st.write("Debug - Successfully added artwork")
+                        except Exception as e:
+                            st.error(f"Error adding artwork: {str(e)}")
+                    
+                    # Save ID3 tags
+                    try:
+                        id3.save(v2_version=3)
+                        st.write("Debug - Saved ID3 tags")
                     except Exception as e:
-                        st.error(f"Error adding artwork: {str(e)}")
-                
-                # Save ID3 tags
-                try:
-                    id3.save(v2_version=3)
-                    st.write("Debug - Saved ID3 tags")
-                except Exception as e:
-                    st.error(f"Error saving ID3 tags: {str(e)}")
+                        st.error(f"Error saving ID3 tags: {str(e)}")
                 
                 # Copy the file with updated tags to the export directory
                 shutil.copy2(tmp_file.name, export_path)
