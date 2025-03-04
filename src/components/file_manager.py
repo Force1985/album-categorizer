@@ -370,7 +370,7 @@ def save_files(uploaded_files: Dict[str, Dict], edited_tags: Dict[str, Dict]) ->
                 except:
                     pass
                     
-        st.success(f'Successfully saved files to {folder_name}')
+        st.toast(f"Successfully saved files to {folder_name}", icon="✅")
         return True
         
     except Exception as e:
