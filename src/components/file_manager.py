@@ -126,10 +126,18 @@ def get_track_metadata(track_id: str) -> Dict[str, str]:
     Returns:
         Dict[str, str]: Track metadata
     """
-    # Get artwork data
+    # Get artwork URL from session state
+    artwork_url = st.session_state.get('selected_artwork')
+    
+    # If no artwork is selected but we have images, automatically select the first one
+    if not artwork_url and st.session_state.get('discogs_images') and len(st.session_state.get('discogs_images', [])) > 0:
+        artwork_url = st.session_state.get('discogs_images')[0]['uri']
+        st.session_state.selected_artwork = artwork_url
+        st.session_state.selected_artwork_index = 0
+    
+    # Download artwork if URL is available
     artwork_data = None
-    if 'selected_artwork' in st.session_state:
-        artwork_url = st.session_state.selected_artwork
+    if artwork_url:
         try:
             # Download artwork data with proper headers
             headers = {
@@ -336,7 +344,7 @@ def save_files(uploaded_files: Dict[str, Dict], edited_tags: Dict[str, Dict]) ->
                         # st.write("Debug - Added comment:", metadata['comment'])
                     
                     # Add artwork if present
-                    if metadata.get('artwork'):
+                    if metadata and metadata.get('artwork'):
                         # st.write("Debug - Adding artwork...")
                         try:
                             # Remove existing artwork
