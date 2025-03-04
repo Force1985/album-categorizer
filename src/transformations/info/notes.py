@@ -112,6 +112,10 @@ def transform_info_notes(notes: str, artist: str, format_descriptions: list[str]
     # Create credit line based on format
     credit_line = f"Mixed by {formatted_artist_string}." if is_mixed else f"Written & produced by {formatted_artist_string}."
     
+    # Store credit line in session state for use in comment field
+    import streamlit as st
+    st.session_state['info_credit_line'] = credit_line
+    
     # Combine credit line with original notes, removing URLs from notes
     if notes:
         cleaned_notes = remove_bbcode_urls(notes)

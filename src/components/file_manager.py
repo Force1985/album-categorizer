@@ -72,9 +72,8 @@ def get_track_info(track_id: str) -> Dict[str, str]:
     # Generate copyright text
     copyright_text = f'{year} {label}' if year and label else ''
     
-    # Generate comment text
-    notes = st.session_state.get('info_notes', '')
-    comment = f'{notes}' if notes else ''
+    # Get credit line for comment
+    comment = st.session_state.get('info_credit_line', '')
     
     # Get position and split into disc (A/B) and track number
     position = st.session_state.get(f'track_position_{track_id}', '')
@@ -140,7 +139,7 @@ def get_track_metadata(track_id: str) -> Dict[str, str]:
             response = requests.get(artwork_url, headers=headers)
             if response.status_code == 200:
                 artwork_data = response.content
-                st.write("Debug - Downloaded artwork data length:", len(artwork_data))
+                # st.write("Debug - Downloaded artwork data length:", len(artwork_data))
             else:
                 st.error(f"Error downloading artwork: {response.status_code} - {response.text}")
         except Exception as e:
@@ -165,9 +164,9 @@ def get_track_metadata(track_id: str) -> Dict[str, str]:
     }
     
     # Debug log
-    st.write("Debug - Metadata:", {k: str(v)[:100] + '...' if isinstance(v, bytes) else v for k, v in metadata.items()})
-    st.write("Debug - Session state keys:", list(st.session_state.keys()))
-    st.write("Debug - Selected artwork URL:", st.session_state.get('selected_artwork', 'Not found'))
+    # st.write("Debug - Metadata:", {k: str(v)[:100] + '...' if isinstance(v, bytes) else v for k, v in metadata.items()})
+    # st.write("Debug - Session state keys:", list(st.session_state.keys()))
+    # st.write("Debug - Selected artwork URL:", st.session_state.get('selected_artwork', 'Not found'))
     
     return metadata
 
@@ -334,11 +333,11 @@ def save_files(uploaded_files: Dict[str, Dict], edited_tags: Dict[str, Dict]) ->
                             desc='description',
                             text=metadata['comment']
                         ))
-                        st.write("Debug - Added comment:", metadata['comment'])
+                        # st.write("Debug - Added comment:", metadata['comment'])
                     
                     # Add artwork if present
                     if metadata.get('artwork'):
-                        st.write("Debug - Adding artwork...")
+                        # st.write("Debug - Adding artwork...")
                         try:
                             # Remove existing artwork
                             id3.delall('APIC')
@@ -350,14 +349,14 @@ def save_files(uploaded_files: Dict[str, Dict], edited_tags: Dict[str, Dict]) ->
                                 desc='Cover',
                                 data=metadata['artwork']
                             ))
-                            st.write("Debug - Successfully added artwork")
+                            # st.write("Debug - Successfully added artwork")
                         except Exception as e:
                             st.error(f"Error adding artwork: {str(e)}")
                     
                     # Save ID3 tags
                     try:
                         id3.save(v2_version=3)
-                        st.write("Debug - Saved ID3 tags")
+                        # st.write("Debug - Saved ID3 tags")
                     except Exception as e:
                         st.error(f"Error saving ID3 tags: {str(e)}")
                 
