@@ -60,7 +60,7 @@ def reset_file_manager_state():
 # Initialize settings
 init_settings()
 
-col1, col2 = st.columns([32, 5])
+col1, col2 = st.columns([19, 2])
 with col1:
     # Main title and description
     st.markdown("<h1 class='custom-title'>Album Categorizer <span>♪</span></h1>", unsafe_allow_html=True)

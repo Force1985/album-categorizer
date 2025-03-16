@@ -20,7 +20,7 @@ def init_settings():
 
 def render_settings() -> None:
     """Render the settings popover"""
-    with st.popover('⚙️ Settings', use_container_width=False):
+    with st.popover('⚙️ Settings', use_container_width=True):
         # Discogs API section
         st.markdown('#### 💿 Discogs API')
         st.markdown("""
