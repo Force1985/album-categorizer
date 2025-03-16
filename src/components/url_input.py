@@ -18,7 +18,8 @@ def render_url_input():
             placeholder="https://www.discogs.com/release/...",
             help="Paste a Discogs album URL here",
             key="url_input",
-            value="https://www.discogs.com/release/169648-Daft-Punk-Discovery"
+            # value="https://www.discogs.com/release/32778759-Luigi-Tozzi-Sentient"
+            # value="https://www.discogs.com/release/169648-Daft-Punk-Discovery"
             # value="https://www.discogs.com/release/30123704-Staffan-Linzatti-Jonas-Kopp-CoLab-009"
             # value="https://www.discogs.com/release/139061-DJ-Antoine-Visit-Me"
             # value="https://www.discogs.com/release/6817-DJ-Slip-Outward-EP"

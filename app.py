@@ -16,6 +16,7 @@ from src.components.image_gallery import render_image_gallery
 from src.components.file_manager import render_file_manager
 from src.components.streaming_services import render_streaming_services
 from src.components.settings_modal import init_settings, render_settings
+from src.components.m3u_generator import render_m3u_generator
 from src.api.discogs import fetch_discogs_data
 
 # Load custom favicon
@@ -163,6 +164,9 @@ if st.session_state.api_response:
 
     # Render file manager
     render_file_manager()
+    
+    # Render M3U generator
+    render_m3u_generator()
     
     # Render streaming services
     render_streaming_services()
